@@ -1,0 +1,33 @@
+name: Security Follow-ups
+
+on:
+  schedule:
+    - cron: '0 */4 * * *' # every 4 hours
+  workflow_dispatch: {}
+
+jobs:
+  followups:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run follow-ups (SES enabled)
+        env:
+          SECURITY_FOLLOWUPS_FILE: .security/followups.json
+          SECURITY_AUTOREPLY_FROM: security@brainsait.com
+          SEND: '1'
+          SECURITY_SENDER: ses
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: node scripts/security-followups.js

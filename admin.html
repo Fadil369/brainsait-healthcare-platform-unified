@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - BrainSAIT</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    <div class="bg-mesh"></div>
+
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="nav-brand">
+                    <div class="nav-logo">🏥</div>
+                    <div class="nav-title">BrainSAIT</div>
+                </div>
+                <div class="nav-links">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="dashboard.html" class="nav-link">Dashboard</a>
+                    <a href="ai-tools.html" class="nav-link">AI Tools</a>
+                    <a href="analytics.html" class="nav-link">Analytics</a>
+                    <a href="admin.html" class="nav-link">Admin</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main">
+        <section class="hero" style="padding: 2rem 0;">
+            <div class="container">
+                <h1 class="section-title">⚙️ Platform Administration</h1>
+                <p class="section-description">System management and compliance monitoring</p>
+                
+                <div style="display: flex; gap: 2rem; align-items: center; margin: 2rem 0;">
+                    <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem; background: rgba(16, 185, 129, 0.2); color: var(--accent-success);">
+                        <div style="width: 8px; height: 8px; background: var(--accent-success); border-radius: 50%; animation: pulse 2s infinite;"></div>
+                        All Systems Operational
+                    </div>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                        Last updated: <span id="last-updated">Just now</span>
+                    </div>
+                </div>
+
+                <div class="services-grid" style="margin-top: 3rem;">
+                    <div class="service-card glass-strong" onclick="openUserManagement()">
+                        <div class="service-header">
+                            <div class="service-icon">👥</div>
+                            <div class="service-info">
+                                <h3>User Management</h3>
+                                <div class="service-status">
+                                    <div class="status-dot"></div>
+                                    Active
+                                </div>
+                            </div>
+                        </div>
+                        <p class="service-description">Manage user accounts and permissions</p>
+                        <div style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
+                            2,847 total users • 156 providers • 23 active sessions
+                        </div>
+                    </div>
+
+                    <div class="service-card glass-strong" onclick="openCompliance()">
+                        <div class="service-header">
+                            <div class="service-icon">🔒</div>
+                            <div class="service-info">
+                                <h3>Compliance Center</h3>
+                                <div class="service-status">
+                                    <div class="status-dot"></div>
+                                    Compliant
+                                </div>
+                            </div>
+                        </div>
+                        <p class="service-description">HIPAA & NPHIES compliance monitoring</p>
+                        <div style="margin-top: 1rem;">
+                            <div style="text-align: center;">
+                                <div style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; margin: 0 auto; background: conic-gradient(var(--accent-success) 0deg 353deg, rgba(255,255,255,0.1) 353deg 360deg);">98.1%</div>
+                                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">HIPAA Score</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="service-card glass-strong" onclick="openSystemHealth()">
+                        <div class="service-header">
+                            <div class="service-icon">🖥️</div>
+                            <div class="service-info">
+                                <h3>System Health</h3>
+                                <div class="service-status">
+                                    <div class="status-dot"></div>
+                                    Healthy
+                                </div>
+                            </div>
+                        </div>
+                        <p class="service-description">Monitor system performance and uptime</p>
+                        <div style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
+                            Uptime: 99.9% • Response: 120ms • CPU: 45%
+                        </div>
+                    </div>
+
+                    <div class="service-card glass-strong" onclick="openAuditLogs()">
+                        <div class="service-header">
+                            <div class="service-icon">📊</div>
+                            <div class="service-info">
+                                <h3>Audit & Logs</h3>
+                                <div class="service-status">
+                                    <div class="status-dot"></div>
+                                    Monitoring
+                                </div>
+                            </div>
+                        </div>
+                        <p class="service-description">Security events and audit trails</p>
+                        <div style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
+                            15,247 events today • 0 critical alerts
+                        </div>
+                    </div>
+
+                    <div class="service-card glass-strong" onclick="openIntegrations()">
+                        <div class="service-header">
+                            <div class="service-icon">🔗</div>
+                            <div class="service-info">
+                                <h3>Integrations</h3>
+                                <div class="service-status">
+                                    <div class="status-dot"></div>
+                                    Connected
+                                </div>
+                            </div>
+                        </div>
+                        <p class="service-description">NPHIES and third-party integrations</p>
+                        <div style="margin-top: 1rem; font-size: 0.9rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                <span>NPHIES</span>
+                                <span style="color: var(--accent-success);">✅</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                <span>FHIR R4</span>
+                                <span style="color: var(--accent-success);">✅</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>AWS Services</span>
+                                <span style="color: var(--accent-success);">✅</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="service-card glass-strong" onclick="openBackup()">
+                        <div class="service-header">
+                            <div class="service-icon">💾</div>
+                            <div class="service-info">
+                                <h3>Backup & Recovery</h3>
+                                <div class="service-status">
+                                    <div class="status-dot"></div>
+                                    Protected
+                                </div>
+                            </div>
+                        </div>
+                        <p class="service-description">Data backup and disaster recovery</p>
+                        <div style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
+                            Last backup: 2 hours ago • 30-day retention
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-strong" style="padding: 2rem; border-radius: 20px; margin-top: 2rem;">
+                    <h3>🚀 Quick Actions</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                        <button class="btn btn-primary" onclick="generateReport()">📄 Generate Report</button>
+                        <button class="btn btn-secondary" onclick="scheduleBackup()">💾 Schedule Backup</button>
+                        <button class="btn btn-secondary" onclick="updateSystem()">🔄 System Update</button>
+                        <button class="btn btn-secondary" onclick="securityScan()">🛡️ Security Scan</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function openUserManagement() {
+            alert('User Management System:\n\n👥 User accounts and roles\n👥 Access permissions\n👥 Session management\n👥 Authentication settings\n👥 User activity logs\n\nOpening user management interface...');
+        }
+
+        function openCompliance() {
+            alert('Compliance Center:\n\n🔒 HIPAA compliance monitoring\n🔒 NPHIES integration status\n🔒 Audit trail management\n🔒 Security assessments\n🔒 Compliance reporting\n\nLaunching compliance dashboard...');
+        }
+
+        function openSystemHealth() {
+            alert('System Health Monitor:\n\n🖥️ Server performance metrics\n🖥️ Database status\n🖥️ Network connectivity\n🖥️ Resource utilization\n🖥️ Error tracking\n\nOpening system monitor...');
+        }
+
+        function openAuditLogs() {
+            alert('Audit & Logging System:\n\n📊 Access logs\n📊 System events\n📊 Security incidents\n📊 Compliance reports\n📊 Performance metrics\n\nAccessing audit logs...');
+        }
+
+        function openIntegrations() {
+            alert('Integration Management:\n\n🔗 NPHIES connectivity\n🔗 FHIR R4 endpoints\n🔗 AWS services\n🔗 Third-party APIs\n🔗 Webhook management\n\nOpening integration console...');
+        }
+
+        function openBackup() {
+            alert('Backup & Recovery:\n\n💾 Automated backups\n💾 Recovery procedures\n💾 Data integrity checks\n💾 Disaster recovery\n💾 Archive management\n\nAccessing backup system...');
+        }
+
+        function generateReport() {
+            alert('Generating Platform Report:\n\n📄 System performance\n📄 User analytics\n📄 Compliance status\n📄 Security assessment\n📄 Financial summary\n\nReport will be available for download.');
+        }
+
+        function scheduleBackup() {
+            alert('Backup Scheduler:\n\n💾 Daily automated backups\n💾 Weekly full backups\n💾 Monthly archive\n💾 Real-time replication\n💾 Disaster recovery\n\nBackup schedule configured.');
+        }
+
+        function updateSystem() {
+            alert('System Update Manager:\n\n🔄 Security patches\n🔄 Feature updates\n🔄 Performance improvements\n🔄 Bug fixes\n🔄 Dependency updates\n\nUpdate scheduled for maintenance window.');
+        }
+
+        function securityScan() {
+            alert('Security Scan Initiated:\n\n🛡️ Vulnerability assessment\n🛡️ Penetration testing\n🛡️ Access control review\n🛡️ Encryption validation\n🛡️ Compliance check\n\nScan will complete in 15 minutes.');
+        }
+
+        // Auto-update timestamp
+        setInterval(() => {
+            document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
+        }, 30000);
+        
+        // AWS Admin Integration
+        document.addEventListener('DOMContentLoaded', async () => {
+            const userRole = localStorage.getItem('userRole');
+            if (!localStorage.getItem('accessToken') || userRole !== 'admin') {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            if (window.awsIntegration) {
+                await awsIntegration.logActivity('admin_access', {});
+                await awsIntegration.publishMetric('AdminPageView', 1);
+            }
+        });
+    </script>
+    
+    <!-- AWS Integration Scripts -->
+    <script src="aws-config.js"></script>
+    <script src="aws-integration.js"></script>
+    <script src="router.js"></script>
+</body>
+</html>

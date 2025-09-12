@@ -3,6 +3,9 @@
  * Demonstrates integration of PerfectSecurity and PerfectCompliance engines
  */
 
+export const dynamic = 'force-static';
+export const revalidate = 0;
+
 import { NextRequest, NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 import { PerfectSecurityEngine } from '../../../../lib/PerfectSecurity';

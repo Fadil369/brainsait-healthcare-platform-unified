@@ -26,6 +26,12 @@ jobs:
       - name: Type check, Lint, Unit tests
         run: npm run ci
 
+      - name: Unit test coverage (enforce thresholds)
+        env:
+          COVERAGE: "1"
+          COVERAGE_GLOBAL: "75"
+        run: npm test -- --ci
+
       - name: Build app
         run: npm run build
 
@@ -54,4 +60,3 @@ jobs:
           if [ -f .next_pid ]; then
             kill $(cat .next_pid) || true
           fi
-

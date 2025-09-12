@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Workflows - BrainSAIT</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.24.min.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav-glass">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="logo-container">
+                        <div class="logo-icon">🧠</div>
+                        <span class="logo-text">BrainSAIT</span>
+                    </div>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="dashboard.html" class="nav-link">Dashboard</a>
+                    <a href="workflows.html" class="nav-link active">Workflows</a>
+                    <a href="analytics.html" class="nav-link">Analytics</a>
+                    <a href="admin.html" class="nav-link">Admin</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <span id="current-user" class="text-sm text-gray-600"></span>
+                    <button onclick="logout()" class="btn-secondary">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container mx-auto px-6 py-8">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold mb-4">AWS Healthcare Workflows</h1>
+                <p class="text-xl text-gray-600">Orchestrated patient journeys with Step Functions and EventBridge</p>
+            </div>
+
+            <!-- Workflow Dashboard -->
+            <div class="grid lg:grid-cols-3 gap-8 mb-8">
+                <!-- Active Workflows -->
+                <div class="glass-card">
+                    <h2 class="text-2xl font-semibold mb-4">Active Workflows</h2>
+                    <div id="active-workflows" class="space-y-3">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Workflow Metrics -->
+                <div class="glass-card">
+                    <h2 class="text-2xl font-semibold mb-4">Real-time Metrics</h2>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-value" id="total-workflows">0</div>
+                            <div class="metric-label">Total Workflows</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="completed-today">0</div>
+                            <div class="metric-label">Completed Today</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="avg-duration">0m</div>
+                            <div class="metric-label">Avg Duration</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="success-rate">0%</div>
+                            <div class="metric-label">Success Rate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="glass-card">
+                    <h2 class="text-2xl font-semibold mb-4">Quick Actions</h2>
+                    <div class="space-y-3">
+                        <button onclick="startWorkflow('admission')" class="workflow-btn">
+                            🏥 Start Patient Admission
+                        </button>
+                        <button onclick="startWorkflow('emergency')" class="workflow-btn emergency">
+                            🚨 Emergency Workflow
+                        </button>
+                        <button onclick="startWorkflow('outpatient')" class="workflow-btn">
+                            👩‍⚕️ Outpatient Visit
+                        </button>
+                        <button onclick="startWorkflow('discharge')" class="workflow-btn">
+                            📋 Discharge Planning
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workflow Builder -->
+            <div class="glass-card mb-8">
+                <h2 class="text-2xl font-semibold mb-6">Custom Workflow Builder</h2>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Workflow Configuration -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Workflow Configuration</h3>
+                        
+                        <div class="form-group">
+                            <label for="workflow-name">Workflow Name</label>
+                            <input type="text" id="workflow-name" placeholder="Enter workflow name">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="workflow-type">Type</label>
+                            <select id="workflow-type">
+                                <option value="patient-care">Patient Care</option>
+                                <option value="diagnostic">Diagnostic</option>
+                                <option value="administrative">Administrative</option>
+                                <option value="emergency">Emergency</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="workflow-priority">Priority</label>
+                            <select id="workflow-priority">
+                                <option value="low">Low</option>
+                                <option value="normal">Normal</option>
+                                <option value="high">High</option>
+                                <option value="critical">Critical</option>
+                            </select>
+                        </div>
+                        
+                        <button onclick="createCustomWorkflow()" class="btn-primary">
+                            Create Workflow
+                        </button>
+                    </div>
+
+                    <!-- Workflow Steps -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Workflow Steps</h3>
+                        <div id="workflow-steps" class="workflow-steps">
+                            <!-- Steps will be added dynamically -->
+                        </div>
+                        
+                        <button onclick="addWorkflowStep()" class="btn-secondary">
+                            + Add Step
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FHIR Integration -->
+            <div class="glass-card mb-8">
+                <h2 class="text-2xl font-semibold mb-6">FHIR R4 Resource Management</h2>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Create FHIR Resource -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Create FHIR Resource</h3>
+                        
+                        <div class="form-group">
+                            <label for="fhir-resource-type">Resource Type</label>
+                            <select id="fhir-resource-type">
+                                <option value="Patient">Patient</option>
+                                <option value="Encounter">Encounter</option>
+                                <option value="Observation">Observation</option>
+                                <option value="DiagnosticReport">Diagnostic Report</option>
+                                <option value="Medication">Medication</option>
+                                <option value="Procedure">Procedure</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="fhir-data">Resource Data (JSON)</label>
+                            <textarea id="fhir-data" rows="6" placeholder='{"name": [{"family": "Doe", "given": ["John"]}]}'></textarea>
+                        </div>
+                        
+                        <button onclick="createFHIRResource()" class="btn-primary">
+                            Create FHIR Resource
+                        </button>
+                    </div>
+
+                    <!-- FHIR Resources List -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Recent FHIR Resources</h3>
+                        <div id="fhir-resources" class="fhir-resources-list">
+                            <!-- Resources will be populated -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event Stream -->
+            <div class="glass-card">
+                <h2 class="text-2xl font-semibold mb-6">Real-time Event Stream</h2>
+                <div id="event-stream" class="event-stream">
+                    <!-- Events will be populated in real-time -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="aws-config.js"></script>
+    <script src="aws-identity.js"></script>
+    <script src="aws-workflows.js"></script>
+    <script>
+        // Real Workflows Integration
+        document.addEventListener('DOMContentLoaded', async () => {
+            checkAuthentication();
+            await initializeRealWorkflows();
+        });
+
+        function checkAuthentication() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (!currentUser) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            document.getElementById('current-user').textContent = `Welcome, ${currentUser}`;
+            identityManager.currentUser = currentUser;
+        }
+
+        async function initializeRealWorkflows() {
+            try {
+                showWorkflowsLoading();
+                
+                // Load real workflow data
+                const workflowData = await realDataManager.getRealWorkflowData();
+                updateWorkflowMetrics(workflowData);
+                
+                // Load active workflows
+                await loadRealActiveWorkflows();
+                
+                // Load FHIR resources
+                await loadRealFHIRResources();
+                
+                // Start event stream
+                startRealEventStream();
+                
+                // Log page access
+                if (window.awsIntegration) {
+                    await awsIntegration.logActivity('workflows_access', {
+                        timestamp: new Date().toISOString()
+                    });
+                }
+                
+                hideWorkflowsLoading();
+                
+            } catch (error) {
+                console.error('Workflows initialization error:', error);
+                showWorkflowsError('Failed to load workflows: ' + error.message);
+            }
+        }
+        
+        function updateWorkflowMetrics(data) {
+            const elements = {
+                'total-workflows': data.activeWorkflows,
+                'completed-today': data.completedToday,
+                'avg-duration': data.avgDuration + 'm',
+                'success-rate': data.successRate + '%'
+            };
+            
+            Object.entries(elements).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                    element.classList.add('updated');
+                }
+            });
+        }
+        
+        async function loadRealActiveWorkflows() {
+            try {
+                const workflows = await awsIntegration.queryData('active-workflows', {
+                    FilterExpression: '#status = :status',
+                    ExpressionAttributeNames: { '#status': 'status' },
+                    ExpressionAttributeValues: { ':status': 'active' },
+                    Limit: 10
+                });
+                
+                const container = document.getElementById('active-workflows');
+                if (container) {
+                    if (workflows.length === 0) {
+                        container.innerHTML = '<p class="text-gray-500 italic">No active workflows</p>';
+                        return;
+                    }
+                    
+                    container.innerHTML = workflows.map(workflow => `
+                        <div class="workflow-item">
+                            <div class="workflow-header">
+                                <span class="workflow-type">${workflow.type}</span>
+                                <span class="workflow-status ${workflow.status}">${workflow.status}</span>
+                            </div>
+                            <div class="workflow-details">
+                                <div>Patient: ${workflow.patientId}</div>
+                                <div>Step: ${workflow.currentStep}</div>
+                                <div>Started: ${new Date(workflow.startTime).toLocaleTimeString()}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Active workflows loading error:', error);
+            }
+        }
+        
+        async function loadRealFHIRResources() {
+            try {
+                const resources = await awsIntegration.queryData('fhir-resources', {
+                    Limit: 5,
+                    ScanIndexForward: false
+                });
+                
+                const container = document.getElementById('fhir-resources');
+                if (container) {
+                    if (resources.length === 0) {
+                        container.innerHTML = '<p class="text-gray-500 italic">No FHIR resources found</p>';
+                        return;
+                    }
+                    
+                    container.innerHTML = resources.map(resource => `
+                        <div class="fhir-resource-item">
+                            <div class="resource-type">${resource.resourceType}</div>
+                            <div class="resource-id">ID: ${resource.id}</div>
+                            <div class="resource-date">${new Date(resource.meta.lastUpdated).toLocaleString()}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('FHIR resources loading error:', error);
+            }
+        }
+        
+        function startRealEventStream() {
+            const container = document.getElementById('event-stream');
+            
+            // Listen for real healthcare events
+            document.addEventListener('healthcareEvent', (event) => {
+                const eventDiv = document.createElement('div');
+                eventDiv.className = 'event-item';
+                eventDiv.innerHTML = `
+                    <div class="event-type">${event.detail.type}</div>
+                    <div class="event-time">${new Date().toLocaleTimeString()}</div>
+                    <div class="event-data">${JSON.stringify(event.detail.data, null, 2)}</div>
+                `;
+                
+                container.insertBefore(eventDiv, container.firstChild);
+                
+                // Keep only last 10 events
+                while (container.children.length > 10) {
+                    container.removeChild(container.lastChild);
+                }
+            });
+        }
+        
+        async function startWorkflow(type) {
+            try {
+                const patientId = `P-${Date.now()}`;
+                
+                // Start real workflow
+                const result = await workflowManager.orchestratePatientJourney(patientId, type);
+                
+                // Update active workflows display
+                await loadRealActiveWorkflows();
+                
+                // Update metrics
+                const workflowData = await realDataManager.getRealWorkflowData();
+                updateWorkflowMetrics(workflowData);
+                
+                showNotification(`${type} workflow started for patient ${patientId}`, 'success');
+                
+            } catch (error) {
+                showNotification(`Failed to start ${type} workflow: ${error.message}`, 'error');
+            }
+        }
+        
+        async function createCustomWorkflow() {
+            const name = document.getElementById('workflow-name').value;
+            const type = document.getElementById('workflow-type').value;
+            const priority = document.getElementById('workflow-priority').value;
+            
+            if (!name) {
+                showNotification('Please enter a workflow name', 'error');
+                return;
+            }
+            
+            const steps = Array.from(document.querySelectorAll('.workflow-step')).map(step => ({
+                name: step.querySelector('.step-name').value,
+                type: step.querySelector('.step-type').value
+            }));
+            
+            if (steps.length === 0) {
+                showNotification('Please add at least one workflow step', 'error');
+                return;
+            }
+            
+            try {
+                // Store workflow definition in DynamoDB
+                const workflowDef = {
+                    id: `workflow-${Date.now()}`,
+                    name,
+                    type,
+                    priority,
+                    steps,
+                    createdBy: identityManager.currentUser,
+                    createdAt: new Date().toISOString()
+                };
+                
+                await awsIntegration.storeData('custom-workflows', workflowDef);
+                
+                showNotification(`Custom workflow "${name}" created successfully`, 'success');
+                
+                // Clear form
+                document.getElementById('workflow-name').value = '';
+                document.getElementById('workflow-steps').innerHTML = '';
+                workflowStepCounter = 0;
+                
+            } catch (error) {
+                showNotification(`Failed to create workflow: ${error.message}`, 'error');
+            }
+        }
+        
+        async function createFHIRResource() {
+            const resourceType = document.getElementById('fhir-resource-type').value;
+            const dataText = document.getElementById('fhir-data').value;
+            
+            if (!dataText) {
+                showNotification('Please enter resource data', 'error');
+                return;
+            }
+            
+            try {
+                const resourceData = JSON.parse(dataText);
+                
+                // Create FHIR resource in DynamoDB
+                const fhirResource = {
+                    resourceType,
+                    id: `${resourceType.toLowerCase()}-${Date.now()}`,
+                    meta: {
+                        versionId: '1',
+                        lastUpdated: new Date().toISOString(),
+                        profile: [`http://hl7.org/fhir/StructureDefinition/${resourceType}`]
+                    },
+                    ...resourceData
+                };
+                
+                await awsIntegration.storeData('fhir-resources', fhirResource);
+                
+                showNotification(`FHIR ${resourceType} resource created successfully`, 'success');
+                document.getElementById('fhir-data').value = '';
+                
+                // Reload FHIR resources
+                await loadRealFHIRResources();
+                
+            } catch (error) {
+                showNotification(`Failed to create FHIR resource: ${error.message}`, 'error');
+            }
+        }
+        
+        function showWorkflowsLoading() {
+            const metrics = document.querySelectorAll('.metric-value');
+            metrics.forEach(metric => {
+                metric.textContent = 'Loading...';
+                metric.classList.add('loading');
+            });
+        }
+        
+        function hideWorkflowsLoading() {
+            const metrics = document.querySelectorAll('.metric-value');
+            metrics.forEach(metric => {
+                metric.classList.remove('loading');
+            });
+        }
+        
+        function showWorkflowsError(message) {
+            const container = document.querySelector('.workflows-container');
+            if (container) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-state';
+                errorDiv.innerHTML = `
+                    <div class="error-message">
+                        <h3>⚠️ Workflows Error</h3>
+                        <p>${message}</p>
+                        <button onclick="window.location.reload()" class="retry-btn">Retry</button>
+                    </div>
+                `;
+                container.prepend(errorDiv);
+            }
+        }
+
+        function showNotification(message, type) {
+            identityManager.showUINotification(message, type);
+        }
+
+        function logout() {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('idToken');
+            localStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        }
+    </script>
+    
+    <!-- Real Data Integration Scripts -->
+    <script src="aws-config.js"></script>
+    <script src="aws-integration.js"></script>
+    <script src="aws-identity.js"></script>
+    <script src="aws-workflows.js"></script>
+    <script src="data-manager.js"></script>
+    <script src="navigation-handler.js"></script>
+    <script src="router.js"></script>
+</body>
+</html>

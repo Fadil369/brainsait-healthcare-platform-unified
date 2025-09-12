@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - BrainSAIT</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    <div class="bg-mesh"></div>
+
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="nav-brand">
+                    <div class="nav-logo">🏥</div>
+                    <div class="nav-title">BrainSAIT</div>
+                </div>
+                <div class="nav-links">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="dashboard.html" class="nav-link">Dashboard</a>
+                    <a href="ai-tools.html" class="nav-link">AI Tools</a>
+                    <a href="analytics.html" class="nav-link">Analytics</a>
+                    <a href="admin.html" class="nav-link">Admin</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main">
+        <section class="hero" style="padding: 2rem 0;">
+            <div class="container">
+                <h1 class="section-title">📊 Healthcare Analytics</h1>
+                <p class="section-description">Advanced analytics and predictive insights</p>
+                
+                <div class="metrics-grid" style="margin-top: 2rem;">
+                    <div class="metric-card glass">
+                        <div class="metric-value" style="color: var(--accent-primary);" id="total-patients">2,847</div>
+                        <div class="metric-label">Total Patients</div>
+                        <div style="font-size: 0.8rem; color: var(--accent-success); margin-top: 0.5rem;">↗ +12.5% vs last month</div>
+                    </div>
+                    <div class="metric-card glass">
+                        <div class="metric-value" style="color: var(--accent-success);" id="satisfaction">4.8/5</div>
+                        <div class="metric-label">Patient Satisfaction</div>
+                        <div style="font-size: 0.8rem; color: var(--accent-success); margin-top: 0.5rem;">↗ +0.3 improvement</div>
+                    </div>
+                    <div class="metric-card glass">
+                        <div class="metric-value" style="color: var(--medical-blue);" id="wait-time">12 min</div>
+                        <div class="metric-label">Avg Wait Time</div>
+                        <div style="font-size: 0.8rem; color: var(--accent-success); margin-top: 0.5rem;">↗ 15% improvement</div>
+                    </div>
+                    <div class="metric-card glass">
+                        <div class="metric-value" style="color: var(--accent-warning);" id="utilization">87%</div>
+                        <div class="metric-label">Staff Utilization</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">Optimal range</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-top: 3rem;">
+                    <div class="glass-strong" style="padding: 2rem; border-radius: 20px;">
+                        <h3>📈 Patient Flow Analytics</h3>
+                        <div style="background: rgba(0,0,0,0.2); border-radius: 15px; padding: 2rem; height: 300px; display: flex; align-items: center; justify-content: center; margin: 1rem 0;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 4rem; margin-bottom: 1rem;">📊</div>
+                                <h4>Interactive Chart</h4>
+                                <p style="color: var(--text-secondary); margin-top: 0.5rem;">
+                                    Real-time patient flow visualization<br>
+                                    Peak hours: 9-11 AM, 2-4 PM<br>
+                                    Average duration: 28 minutes
+                                </p>
+                                <button class="btn btn-primary" style="margin-top: 1rem;" onclick="openCharts()">View Charts</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-strong" style="padding: 2rem; border-radius: 20px;">
+                        <h3>🔮 Predictive Insights</h3>
+                        <div style="margin-top: 1rem;">
+                            <div style="background: rgba(14, 165, 233, 0.1); border-left: 4px solid var(--accent-primary); padding: 1rem; border-radius: 10px; margin-bottom: 1rem;">
+                                <h4 style="margin-bottom: 0.5rem;">Resource Optimization</h4>
+                                <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                                    Predicted 15% increase in cardiology appointments next week
+                                </p>
+                            </div>
+                            
+                            <div style="background: rgba(16, 185, 129, 0.1); border-left: 4px solid var(--accent-success); padding: 1rem; border-radius: 10px; margin-bottom: 1rem;">
+                                <h4 style="margin-bottom: 0.5rem;">Revenue Forecast</h4>
+                                <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                                    Q2 revenue projected to exceed target by 8.3%
+                                </p>
+                            </div>
+                            
+                            <div style="background: rgba(234, 88, 12, 0.1); border-left: 4px solid var(--accent-warning); padding: 1rem; border-radius: 10px;">
+                                <h4 style="margin-bottom: 0.5rem;">Capacity Planning</h4>
+                                <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                                    Consider adding 2 more imaging slots on Thursdays
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-strong" style="padding: 2rem; border-radius: 20px; margin-top: 2rem;">
+                    <h3>📊 Performance Metrics</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
+                        <div style="text-align: center; padding: 1rem;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-success); margin-bottom: 0.5rem;">99.9%</div>
+                            <div style="font-size: 0.9rem; color: var(--text-secondary);">System Uptime</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-primary); margin-bottom: 0.5rem;">120ms</div>
+                            <div style="font-size: 0.9rem; color: var(--text-secondary);">Response Time</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-warning); margin-bottom: 0.5rem;">98.5%</div>
+                            <div style="font-size: 0.9rem; color: var(--text-secondary);">Claims Approval</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--medical-blue); margin-bottom: 0.5rem;">$2.4M</div>
+                            <div style="font-size: 0.9rem; color: var(--text-secondary);">Revenue YTD</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function openCharts() {
+            alert('Advanced Analytics Dashboard:\n\n📊 Patient flow patterns\n📊 Resource utilization trends\n📊 Revenue analytics\n📊 Operational efficiency metrics\n📊 Predictive modeling\n📊 Custom report builder\n\nLaunching interactive charts...');
+        }
+
+        // Update metrics every 30 seconds
+        setInterval(() => {
+            document.getElementById('total-patients').textContent = Math.floor(2800 + Math.random() * 100).toLocaleString();
+            document.getElementById('satisfaction').textContent = (4.7 + Math.random() * 0.3).toFixed(1) + '/5';
+            document.getElementById('wait-time').textContent = Math.floor(10 + Math.random() * 5) + ' min';
+            document.getElementById('utilization').textContent = Math.floor(85 + Math.random() * 5) + '%';
+        }, 30000);
+        
+        // Real Analytics Integration
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!localStorage.getItem('accessToken')) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            await initializeRealAnalytics();
+        });
+        
+        async function initializeRealAnalytics() {
+            try {
+                showAnalyticsLoading();
+                
+                // Load real analytics data
+                const analyticsData = await realDataManager.getRealAnalyticsData();
+                updateAnalyticsDisplay(analyticsData);
+                
+                // Start real-time updates
+                startAnalyticsUpdates();
+                
+                // Log page access
+                if (window.awsIntegration) {
+                    await awsIntegration.logActivity('analytics_access', {
+                        timestamp: new Date().toISOString()
+                    });
+                }
+                
+                hideAnalyticsLoading();
+                
+            } catch (error) {
+                console.error('Analytics initialization error:', error);
+                showAnalyticsError('Failed to load analytics: ' + error.message);
+            }
+        }
+        
+        function updateAnalyticsDisplay(data) {
+            const elements = {
+                'total-visits': data.totalVisits,
+                'avg-treatment-time': Math.round(data.avgTreatmentTime) + ' min',
+                'satisfaction-score': data.satisfactionScore.toFixed(1),
+                'efficiency': data.efficiency + '%'
+            };
+            
+            Object.entries(elements).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                    element.classList.add('updated');
+                }
+            });
+        }
+        
+        function startAnalyticsUpdates() {
+            setInterval(async () => {
+                try {
+                    const analyticsData = await realDataManager.getRealAnalyticsData();
+                    updateAnalyticsDisplay(analyticsData);
+                    
+                    if (window.awsIntegration) {
+                        await awsIntegration.publishMetric('AnalyticsRefresh', 1);
+                    }
+                } catch (error) {
+                    console.error('Analytics update error:', error);
+                }
+            }, 60000);
+        }
+        
+        function showAnalyticsLoading() {
+            const metrics = document.querySelectorAll('.metric-value');
+            metrics.forEach(metric => {
+                metric.textContent = 'Loading...';
+                metric.classList.add('loading');
+            });
+        }
+        
+        function hideAnalyticsLoading() {
+            const metrics = document.querySelectorAll('.metric-value');
+            metrics.forEach(metric => {
+                metric.classList.remove('loading');
+            });
+        }
+        
+        function showAnalyticsError(message) {
+            const container = document.querySelector('.analytics-container');
+            if (container) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-state';
+                errorDiv.innerHTML = `
+                    <div class="error-message">
+                        <h3>⚠️ Analytics Error</h3>
+                        <p>${message}</p>
+                        <button onclick="window.location.reload()" class="retry-btn">Retry</button>
+                    </div>
+                `;
+                container.prepend(errorDiv);
+            }
+        }
+    </script>
+    
+    <!-- Real Data Integration Scripts -->
+    <script src="aws-config.js"></script>
+    <script src="aws-integration.js"></script>
+    <script src="data-manager.js"></script>
+    <script src="navigation-handler.js"></script>
+    <script src="router.js"></script>
+</body>
+</html>

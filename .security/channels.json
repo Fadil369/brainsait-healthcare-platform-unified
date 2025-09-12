@@ -1,0 +1,46 @@
+{
+  "payers": ["payer", "insurance", "treasury", "issuing", "stripe", "bank"],
+  "providers": ["provider", "hospital", "clinic", "ehr", "emr"],
+  "regulators": ["moh", "ministry", "regulator", "audit", "compliance office"],
+  "nphies": [
+    "nphies",
+    "fhir",
+    "saudi",
+    "hl7",
+    "eligibilityrequest",
+    "eligibilityresponse",
+    "coverageeligibilityrequest",
+    "coverageeligibilityresponse",
+    "preauthorizationrequest",
+    "preauthorizationapproval",
+    "preauthorizationdenial",
+    "claim",
+    "claimresponse",
+    "adjudication",
+    "explanationofbenefit",
+    "remittance",
+    "paymentreconciliation",
+    "paymentnotice",
+    "capabilitystatement",
+    "implementationguide",
+    "structuredefinition",
+    "valueset",
+    "codesystem"
+  ],
+  "claims": ["claim", "claims", "adjudication"],
+  "denials": ["denial", "rejection", "refuse"],
+  "billing": ["bill", "invoice", "billing"],
+  "payments": ["payment", "pay", "card", "ach", "wire"],
+  "banking": [
+    "treasury", "issuing", "ach", "wire", "reconciliation", "settlement", "dispute", "chargeback",
+    "payout", "kyc", "kyb", "aml", "fraud", "pci", "swift", "iban", "mt103"
+  ],
+  "api-requests": ["request", "http request", "client"],
+  "api-responses": ["response", "http response", "payload", "schema"]
+  ,
+  "rcm": [
+    "registration", "eligibility", "authorization", "charge capture", "coding", "claim submission",
+    "adjudication", "denial", "appeal", "patient billing", "payment posting", "reconciliation",
+    "refund", "collections", "report", "audit"
+  ]
+}

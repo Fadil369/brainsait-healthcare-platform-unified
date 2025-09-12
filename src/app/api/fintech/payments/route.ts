@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+export const dynamic = 'force-static';
+export const revalidate = 0;
 import { StripeHealthcareFinTechAgent } from '@/lib/StripeHealthcareFinTechAgent';
 import { getClientIP, rateLimit, requireAuthHeaders, parseJson } from '@/utils/api';
 import { ProcessPaymentSchema, ClaimSchema, WorkflowIntegrationSchema } from '@/schemas/fintech';
@@ -10,6 +12,8 @@ const fintechAgent = new StripeHealthcareFinTechAgent();
 export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
+  const rid = request.headers.get('x-request-id') || `req-${Date.now()}`;
+  
   try {
     const ip = getClientIP(request);
     if (!rateLimit(ip, 'fintech:payments:post', 30, 60_000)) {
@@ -18,11 +22,11 @@ export async function POST(request: NextRequest) {
     if (!requireAuthHeaders(request)) {
       return NextResponse.json({ success: false, error: 'Authentication required' }, { status: 401 });
     }
-    const rid = request.headers.get('x-request-id') || undefined;
+    
     const body = await parseJson<{ action: string; data: any }>(request);
     const { action, data } = body;
     const role = (request.headers.get('x-user-role') || 'provider') as Role;
-    logger.info('payments_api_request', { action, rid, role });
+    logger.info('payments_api_request', { action, requestId: rid, role });
 
     switch (action) {
       case 'process_payment':
@@ -31,7 +35,12 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: false, error: 'Insufficient permissions' }, { status: 403 });
           }
           const parsed = ProcessPaymentSchema.parse(data);
-          const paymentResult = await fintechAgent.processHealthcarePayment(parsed);
+          // Ensure id is provided for the payment
+          const paymentData = {
+            ...parsed,
+            id: parsed.id || `payment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+          };
+          const paymentResult = await fintechAgent.processHealthcarePayment(paymentData);
           return NextResponse.json(paymentResult);
         }
 
@@ -75,7 +84,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    logger.error('Payment API error', { error: (error as any)?.message, rid });
+    logger.error('Payment API error', { error: (error as any)?.message, requestId: rid });
     return NextResponse.json(
       { success: false, error: 'Payment processing failed' },
       { status: 500 }

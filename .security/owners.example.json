@@ -1,0 +1,17 @@
+{
+  "nphies": {
+    "claims": { "assignees": ["your-username"], "team": "@your-org/sec-nphies-claims" },
+    "*": { "assignees": ["your-username"] }
+  },
+  "banking": {
+    "ach": { "assignees": ["your-username"], "team": "@your-org/sec-banking" },
+    "*": { "assignees": ["your-username"] }
+  },
+  "rcm": {
+    "denial-management": { "assignees": ["your-username"], "team": "@your-org/sec-rcm" },
+    "*": { "assignees": ["your-username"] }
+  },
+  "*": {
+    "*": { "assignees": ["fallback-username"] }
+  }
+}

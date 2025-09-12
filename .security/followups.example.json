@@ -1,0 +1,14 @@
+[
+  {
+    "id": "example-1",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "event": {
+      "subject": "Possible XSS on dashboard",
+      "from": "researcher@example.com",
+      "to": "security@brainsait.com",
+      "body": "..."
+    },
+    "severity": "high",
+    "followUpsSent": []
+  }
+]

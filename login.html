@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - BrainSAIT Healthcare</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.24.min.js"></script>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="mesh-gradient"></div>
+        
+        <div class="auth-card glass-strong">
+            <div class="auth-header">
+                <div class="logo-container">
+                    <div class="logo-icon">🧠</div>
+                    <span class="logo-text">BrainSAIT</span>
+                </div>
+                <h1>Healthcare Platform Login</h1>
+                <p>Secure access with AWS Cognito</p>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchTab('login')">Sign In</button>
+                <button class="auth-tab" onclick="switchTab('register')">Register</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form">
+                <div class="form-group">
+                    <label for="login-username">Username</label>
+                    <input type="text" id="login-username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="remember-me">
+                        <span class="checkmark"></span>
+                        Remember me
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn-primary full-width">
+                    <span class="btn-text">Sign In</span>
+                    <span class="btn-loader" style="display: none;">🔄</span>
+                </button>
+                
+                <div class="auth-links">
+                    <a href="#" onclick="showForgotPassword()">Forgot Password?</a>
+                </div>
+            </form>
+
+            <!-- Registration Form -->
+            <form id="register-form" class="auth-form" style="display: none;">
+                <div class="form-group">
+                    <label for="reg-username">Username</label>
+                    <input type="text" id="reg-username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reg-email">Email</label>
+                    <input type="email" id="reg-email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reg-password">Password</label>
+                    <input type="password" id="reg-password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="user-type">User Type</label>
+                    <select id="user-type" required>
+                        <option value="">Select Role</option>
+                        <option value="doctor">Doctor</option>
+                        <option value="nurse">Nurse</option>
+                        <option value="admin">Administrator</option>
+                        <option value="patient">Patient</option>
+                        <option value="technician">Technician</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="license-number">License Number (Optional)</label>
+                    <input type="text" id="license-number">
+                </div>
+                
+                <button type="submit" class="btn-primary full-width">
+                    <span class="btn-text">Create Account</span>
+                    <span class="btn-loader" style="display: none;">🔄</span>
+                </button>
+            </form>
+
+            <!-- Status Messages -->
+            <div id="auth-status" class="auth-status"></div>
+
+            <!-- AWS Services Status -->
+            <div class="aws-status">
+                <h3>AWS Identity Services</h3>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <span class="status-dot active"></span>
+                        <span>Cognito User Pools</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-dot active"></span>
+                        <span>Identity Federation</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-dot active"></span>
+                        <span>Multi-Factor Auth</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="aws-config.js"></script>
+    <script src="aws-identity.js"></script>
+    <script src="super-admin.js"></script>
+    <script>
+        // Authentication handlers
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            const statusEl = document.getElementById('auth-status');
+            const btnText = document.querySelector('#login-form .btn-text');
+            const btnLoader = document.querySelector('#login-form .btn-loader');
+            
+            try {
+                btnText.style.display = 'none';
+                btnLoader.style.display = 'inline';
+                statusEl.textContent = 'Authenticating with AWS Cognito...';
+                statusEl.className = 'auth-status info';
+                
+                // Check for super admin access
+                if (superAdmin.isSuperAdmin(username)) {
+                    // Super admin bypass - any password works
+                    superAdmin.grantSuperAdminAccess();
+                    statusEl.textContent = '👑 Super Admin Access Granted!';
+                    statusEl.className = 'auth-status success';
+                    
+                    localStorage.setItem('currentUser', username);
+                    localStorage.setItem('accessToken', 'super-admin-token');
+                    localStorage.setItem('userRole', 'superadmin');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'admin.html';
+                    }, 1500);
+                    return;
+                }
+                
+                const result = await identityManager.signIn(username, password);
+                
+                if (result.AuthenticationResult) {
+                    statusEl.textContent = 'Login successful! Redirecting...';
+                    statusEl.className = 'auth-status success';
+                    
+                    // Store tokens
+                    localStorage.setItem('accessToken', result.AuthenticationResult.AccessToken);
+                    localStorage.setItem('idToken', result.AuthenticationResult.IdToken);
+                    localStorage.setItem('currentUser', username);
+                    
+                    // Redirect based on user role
+                    setTimeout(() => {
+                        const userRole = identityManager.userRole;
+                        const redirectMap = {
+                            'superadmin': 'admin.html',
+                            'doctor': 'dashboard.html',
+                            'nurse': 'dashboard.html',
+                            'admin': 'admin.html',
+                            'patient': 'dashboard.html',
+                            'technician': 'ai-tools.html'
+                        };
+                        
+                        window.location.href = redirectMap[userRole] || 'dashboard.html';
+                    }, 1500);
+                } else {
+                    throw new Error('Authentication failed');
+                }
+                
+            } catch (error) {
+                statusEl.textContent = 'Login failed: ' + error.message;
+                statusEl.className = 'auth-status error';
+            } finally {
+                btnText.style.display = 'inline';
+                btnLoader.style.display = 'none';
+            }
+        });
+
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('reg-username').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const userType = document.getElementById('user-type').value;
+            const statusEl = document.getElementById('auth-status');
+            const btnText = document.querySelector('#register-form .btn-text');
+            const btnLoader = document.querySelector('#register-form .btn-loader');
+            
+            try {
+                btnText.style.display = 'none';
+                btnLoader.style.display = 'inline';
+                statusEl.textContent = 'Creating account with AWS Cognito...';
+                statusEl.className = 'auth-status info';
+                
+                const result = await identityManager.signUp(username, password, email, userType);
+                
+                if (result.UserSub) {
+                    statusEl.textContent = 'Account created successfully! Please check your email for verification.';
+                    statusEl.className = 'auth-status success';
+                    
+                    // Switch to login tab
+                    setTimeout(() => {
+                        switchTab('login');
+                        document.getElementById('login-username').value = username;
+                    }, 2000);
+                } else {
+                    throw new Error('Registration failed');
+                }
+                
+            } catch (error) {
+                statusEl.textContent = 'Registration failed: ' + error.message;
+                statusEl.className = 'auth-status error';
+            } finally {
+                btnText.style.display = 'inline';
+                btnLoader.style.display = 'none';
+            }
+        });
+
+        function switchTab(tab) {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const tabs = document.querySelectorAll('.auth-tab');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'login') {
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+                tabs[0].classList.add('active');
+            } else {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+                tabs[1].classList.add('active');
+            }
+            
+            document.getElementById('auth-status').textContent = '';
+        }
+
+        function showForgotPassword() {
+            const statusEl = document.getElementById('auth-status');
+            statusEl.textContent = 'Password reset functionality will be implemented with AWS Cognito forgot password flow.';
+            statusEl.className = 'auth-status info';
+        }
+
+        // Check if user is already logged in
+        window.addEventListener('load', () => {
+            const accessToken = localStorage.getItem('accessToken');
+            const currentUser = localStorage.getItem('currentUser');
+            
+            if (accessToken && currentUser) {
+                const statusEl = document.getElementById('auth-status');
+                statusEl.textContent = `Welcome back, ${currentUser}! Redirecting to dashboard...`;
+                statusEl.className = 'auth-status success';
+                
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+            }
+        });
+    </script>
+</body>
+</html>

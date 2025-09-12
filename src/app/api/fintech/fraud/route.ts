@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+export const dynamic = 'force-static';
+export const revalidate = 0;
 import { StripeHealthcareFinTechAgent } from '@/lib/StripeHealthcareFinTechAgent';
 import { getClientIP, rateLimit, requireAuthHeaders, parseJson } from '@/utils/api';
 import { FraudAnalyzeSchema, TimeRangeSchema, ProviderRiskSchema } from '@/schemas/fintech';

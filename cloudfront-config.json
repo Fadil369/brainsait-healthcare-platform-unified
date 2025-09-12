@@ -1,0 +1,32 @@
+{
+  "CallerReference": "brainsait-healthcare-1757683128",
+  "Comment": "BrainSAIT Healthcare Platform - HIPAA Compliant CDN",
+  "DefaultCacheBehavior": {
+    "TargetOriginId": "S3-brainsait-healthcare-1757683128",
+    "ViewerProtocolPolicy": "redirect-to-https",
+    "MinTTL": 0,
+    "ForwardedValues": {
+      "QueryString": false,
+      "Cookies": {"Forward": "none"}
+    },
+    "ResponseHeadersPolicy": {
+      "ResponseHeadersPolicyId": "67f7725c-6f97-4210-82d7-5512b31e9d03"
+    }
+  },
+  "Origins": {
+    "Quantity": 1,
+    "Items": [
+      {
+        "Id": "S3-brainsait-healthcare-1757683128",
+        "DomainName": "brainsait-healthcare-1757683128.s3-website-us-east-1.amazonaws.com",
+        "CustomOriginConfig": {
+          "HTTPPort": 80,
+          "HTTPSPort": 443,
+          "OriginProtocolPolicy": "http-only"
+        }
+      }
+    ]
+  },
+  "Enabled": true,
+  "PriceClass": "PriceClass_100"
+}

@@ -1,6 +1,6 @@
 export type Role = 'admin' | 'provider' | 'auditor' | 'patient' | 'system';
 
-type Permission = `${string}:${'READ'|'WRITE'|'READ_WRITE'}`;
+type Permission = `${string}:${'READ'|'WRITE'|'READ_WRITE'}` | '*:*';
 
 const rolePermissions: Record<Role, Permission[]> = {
   admin: ['FINTECH:READ_WRITE', 'COMPLIANCE_API:READ_WRITE', 'COMPLIANCE_STATUS:READ'],
@@ -13,11 +13,10 @@ const rolePermissions: Record<Role, Permission[]> = {
 export function hasAccess(role: Role, resource: string, action: 'READ'|'WRITE'|'READ_WRITE') {
   const req: Permission = `${resource}:${action}` as Permission;
   const perms = rolePermissions[role] || [];
-  if (perms.includes('*:*')) return true;
+  if (perms.includes('*:*' as Permission)) return true;
   if (perms.includes(req)) return true;
   if (action === 'READ_WRITE') {
     return perms.includes(`${resource}:READ` as Permission) && perms.includes(`${resource}:WRITE` as Permission);
   }
   return false;
 }
-

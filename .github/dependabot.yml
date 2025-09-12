@@ -1,0 +1,32 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "brainsait-team"
+    assignees:
+      - "brainsait-team"
+    commit-message:
+      prefix: "🔧"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "healthcare"
+    ignore:
+      - dependency-name: "@types/*"
+        update-types: ["version-update:semver-patch"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/.github/workflows"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "🔧 CI:"
+    labels:
+      - "ci/cd"
+      - "github-actions"

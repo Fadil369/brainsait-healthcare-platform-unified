@@ -1,0 +1,122 @@
+name: 🏥 Healthcare Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  fhir-validation:
+    name: 🔬 FHIR Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Test FHIR endpoints
+        run: |
+          echo "🔬 Testing FHIR R4 compliance..."
+          npm run build
+          # Test FHIR metadata endpoint
+          node -e "
+            const handler = require('./lambda-fhir.js').handler;
+            handler({path: '/fhir/metadata'}).then(res => {
+              const body = JSON.parse(res.body);
+              if (body.resourceType === 'CapabilityStatement') {
+                console.log('✅ FHIR metadata endpoint working');
+              } else {
+                console.log('❌ FHIR metadata endpoint failed');
+                process.exit(1);
+              }
+            });
+          "
+
+  nphies-integration:
+    name: 🇸🇦 NPHIES Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Test NPHIES endpoints
+        run: |
+          echo "🇸🇦 Testing NPHIES integration..."
+          # Test eligibility endpoint
+          node -e "
+            const handler = require('./lambda-nphies.js').handler;
+            handler({path: '/nphies/eligibility', httpMethod: 'POST'}).then(res => {
+              const body = JSON.parse(res.body);
+              if (body.resourceType === 'CoverageEligibilityResponse') {
+                console.log('✅ NPHIES eligibility endpoint working');
+              } else {
+                console.log('❌ NPHIES eligibility endpoint failed');
+                process.exit(1);
+              }
+            });
+          "
+          
+          # Test claim endpoint
+          node -e "
+            const handler = require('./lambda-nphies.js').handler;
+            handler({path: '/nphies/claim', httpMethod: 'POST'}).then(res => {
+              const body = JSON.parse(res.body);
+              if (body.resourceType === 'Claim') {
+                console.log('✅ NPHIES claim endpoint working');
+              } else {
+                console.log('❌ NPHIES claim endpoint failed');
+                process.exit(1);
+              }
+            });
+          "
+
+  accessibility-tests:
+    name: ♿ Accessibility Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build application
+        run: npm run build
+      
+      - name: Run accessibility tests
+        run: |
+          echo "♿ Running accessibility validation..."
+          # Check for aria-labels
+          if grep -r "aria-label" src/components/ > /dev/null; then
+            echo "✅ ARIA labels found"
+          else
+            echo "⚠️ Consider adding more ARIA labels"
+          fi
+          
+          # Check for semantic HTML
+          if grep -r "button\|nav\|main\|section" src/components/ > /dev/null; then
+            echo "✅ Semantic HTML elements found"
+          else
+            echo "⚠️ Consider using more semantic HTML"
+          fi

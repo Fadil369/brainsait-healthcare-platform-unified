@@ -1,0 +1,92 @@
+name: ⚡ Performance Monitoring
+
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '0 */6 * * *' # Every 6 hours
+
+jobs:
+  lighthouse-audit:
+    name: 🔍 Lighthouse Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          urls: |
+            https://d3oif6xq7fxrff.cloudfront.net
+          configPath: './.lighthouserc.json'
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+  api-performance:
+    name: 🚀 API Performance Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Test API response times
+        run: |
+          echo "🚀 Testing API performance..."
+          
+          # Test health endpoint
+          HEALTH_TIME=$(curl -w "%{time_total}" -s -o /dev/null https://vmzuql0azj.execute-api.us-east-1.amazonaws.com/prod/health)
+          echo "Health API: ${HEALTH_TIME}s"
+          
+          # Test FHIR endpoint
+          FHIR_TIME=$(curl -w "%{time_total}" -s -o /dev/null https://vmzuql0azj.execute-api.us-east-1.amazonaws.com/prod/fhir/metadata)
+          echo "FHIR API: ${FHIR_TIME}s"
+          
+          # Test NPHIES endpoint
+          NPHIES_TIME=$(curl -w "%{time_total}" -s -o /dev/null -X POST https://vmzuql0azj.execute-api.us-east-1.amazonaws.com/prod/nphies/eligibility -H "Content-Type: application/fhir+json" -d '{}')
+          echo "NPHIES API: ${NPHIES_TIME}s"
+          
+          # Validate performance thresholds
+          if (( $(echo "$HEALTH_TIME > 2.0" | bc -l) )); then
+            echo "❌ Health API too slow: ${HEALTH_TIME}s"
+            exit 1
+          fi
+          
+          if (( $(echo "$FHIR_TIME > 2.0" | bc -l) )); then
+            echo "❌ FHIR API too slow: ${FHIR_TIME}s"
+            exit 1
+          fi
+          
+          if (( $(echo "$NPHIES_TIME > 3.0" | bc -l) )); then
+            echo "❌ NPHIES API too slow: ${NPHIES_TIME}s"
+            exit 1
+          fi
+          
+          echo "✅ All APIs within performance thresholds"
+
+  bundle-analysis:
+    name: 📦 Bundle Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build and analyze bundle
+        run: |
+          npm run build
+          echo "📦 Bundle analysis:"
+          du -sh out/
+          
+          # Check bundle size
+          BUNDLE_SIZE=$(du -s out/ | cut -f1)
+          if [ $BUNDLE_SIZE -gt 10000 ]; then
+            echo "⚠️ Bundle size is large: ${BUNDLE_SIZE}KB"
+          else
+            echo "✅ Bundle size is optimal: ${BUNDLE_SIZE}KB"
+          fi

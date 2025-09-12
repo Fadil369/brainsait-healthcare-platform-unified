@@ -1,0 +1,76 @@
+name: 🔒 Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 2 * * 1' # Weekly on Monday at 2 AM
+
+jobs:
+  security-scan:
+    name: 🛡️ Security Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+        continue-on-error: true
+      
+      - name: Run CodeQL Analysis
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript,typescript
+      
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+      
+      - name: Run Snyk Security Scan
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+        continue-on-error: true
+
+  hipaa-compliance:
+    name: 🏥 HIPAA Compliance Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check for PHI in code
+        run: |
+          echo "🔍 Scanning for potential PHI exposure..."
+          if grep -r -i "ssn\|social.*security\|patient.*id\|medical.*record" src/ --exclude-dir=node_modules; then
+            echo "⚠️ Potential PHI found in code"
+            exit 1
+          else
+            echo "✅ No PHI patterns detected"
+          fi
+      
+      - name: Validate security headers
+        run: |
+          echo "🔒 Checking security configurations..."
+          if grep -q "X-HIPAA-Compliant" next.config.js; then
+            echo "✅ HIPAA compliance headers configured"
+          else
+            echo "❌ Missing HIPAA compliance headers"
+            exit 1
+          fi

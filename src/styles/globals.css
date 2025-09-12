@@ -2,6 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Color indicator utility */
+.color-indicator {
+  background-color: var(--indicator-color);
+}
+
+/* Healthcare platform specific styles */
+.healthcare-card {
+  @apply bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700;
+}
+
+.healthcare-button {
+  @apply px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+/* HIPAA compliant form styles */
+.hipaa-input {
+  @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white;
+}
+
 /* BrainSAIT Healthcare Platform - Enhanced Global Styles */
 
 :root {

@@ -1,0 +1,42 @@
+name: Security Channels Router
+
+on:
+  schedule:
+    - cron: '15 * * * *' # hourly at :15
+  workflow_dispatch: {}
+
+jobs:
+  channels:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Route inbox items to channels (dry-run writes to repo workspace)
+        run: node scripts/security-channels.js
+
+      - name: Upload routed artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-pipelines
+          path: .security/pipelines
+          if-no-files-found: ignore
+
+      - name: Create GitHub issues for new routed items
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: node scripts/security-issues.js

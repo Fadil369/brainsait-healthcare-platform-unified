@@ -24,6 +24,7 @@ import {
   Shield,
   Sun,
   TrendingUp,
+  Network,
   Users,
   X,
   Zap,
@@ -37,6 +38,7 @@ import {
   RevenueAnalyticsChart,
   VitalSignsChart,
 } from "./MedicalVisualizationComponents";
+import OidTree from "./OidTree";
 
 // Enhanced TypeScript Interfaces
 interface DashboardState {
@@ -471,6 +473,13 @@ const SuperiorHealthcareDashboard: React.FC = () => {
       badge: null,
     },
     {
+      id: "oid-management",
+      label: "OID Management",
+      labelAr: "إدارة المعرفات",
+      icon: Network,
+      badge: "NEW",
+    },
+    {
       id: "reports",
       label: "Reports",
       labelAr: "التقارير",
@@ -688,10 +697,11 @@ const SuperiorHealthcareDashboard: React.FC = () => {
           </button>
           <button
             className="px-3 py-2 bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors"
-            title="More options"
+            title="More patient options"
             aria-label="More patient options"
+            type="button"
           >
-            <MoreHorizontal className="w-4 h-4" />
+            <MoreHorizontal className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
       </motion.div>
@@ -1168,8 +1178,50 @@ const SuperiorHealthcareDashboard: React.FC = () => {
               </div>
             )}
 
+            {/* OID Management View */}
+            {state.activeView === "oid-management" && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+                      OID Management
+                    </h2>
+                    <p className="text-gray-500 dark:text-gray-400 mt-2">
+                      Healthcare System Identity Registry & Management
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <button
+                      type="button"
+                      className="flex items-center space-x-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-colors"
+                    >
+                      <Plus size={16} />
+                      <span>Add OID</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="p-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-xl transition-colors"
+                    >
+                      <Settings size={16} />
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                  <div className="h-[600px]">
+                    <OidTree
+                      onNodeSelect={(node) => {
+                        console.log('Selected OID node:', node);
+                      }}
+                      className="h-full"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Other Views Placeholder */}
-            {state.activeView !== "overview" && (
+            {state.activeView !== "overview" && state.activeView !== "oid-management" && (
               <div className="text-center py-20">
                 <div className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-3xl flex items-center justify-center mx-auto mb-6">
                   {(() => {

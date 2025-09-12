@@ -6,7 +6,11 @@ import ToastProvider from "@/components/ToastProvider";
 import MeshBackground from "@/components/MeshBackground";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
-const plexArabic = IBM_Plex_Sans_Arabic({ subsets: ["arabic"], display: "swap" });
+const plexArabic = IBM_Plex_Sans_Arabic({ 
+  subsets: ["arabic"], 
+  display: "swap",
+  weight: ["400", "500", "600", "700"]
+});
 
 export const metadata: Metadata = {
   title: "BrainSAIT Unified Healthcare Platform",

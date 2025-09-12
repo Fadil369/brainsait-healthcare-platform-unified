@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tools - BrainSAIT Healthcare</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="enhanced-layout.css">
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.24.min.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav-glass">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="logo-container">
+                        <div class="logo-icon">🧠</div>
+                        <span class="logo-text">BrainSAIT</span>
+                    </div>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="dashboard.html" class="nav-link">Dashboard</a>
+                    <a href="ai-tools.html" class="nav-link active">AI Tools</a>
+                    <a href="workflows.html" class="nav-link">Workflows</a>
+                    <a href="analytics.html" class="nav-link">Analytics</a>
+                    <a href="admin.html" class="nav-link">Admin</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <span id="current-user" class="text-sm text-gray-600"></span>
+                    <button onclick="logout()" class="btn-secondary">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container mx-auto px-6 py-8">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold mb-4">AWS AI Medical Tools</h1>
+                <p class="text-xl text-gray-600">Advanced AI-powered healthcare solutions with real AWS integration</p>
+            </div>
+
+            <!-- AI Tools Grid -->
+            <div class="grid lg:grid-cols-2 gap-12 mb-12">
+                <!-- Medical Transcription Tool -->
+                <div class="glass-card">
+                    <div class="flex items-center mb-6">
+                        <div class="service-icon mr-4">🎤</div>
+                        <div>
+                            <h2 class="text-2xl font-semibold">Medical Transcription</h2>
+                            <p class="text-gray-400">AWS HealthScribe Integration</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <div class="text-center mb-4">
+                            <button id="start-transcription-btn" onclick="startMedicalTranscription()" 
+                                    class="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-full text-lg font-medium transition-colors">
+                                🎤 Start Recording
+                            </button>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-2">Or upload audio file:</label>
+                            <input type="file" id="audio-upload" accept="audio/*" 
+                                   class="w-full p-3 border border-gray-300 rounded-lg">
+                        </div>
+                        
+                        <div id="transcription-status" class="text-gray-600 mb-4">Ready to transcribe</div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div id="transcription-progress" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div id="transcription-result" class="min-h-32 bg-gray-50 p-4 rounded-lg">
+                        <p class="text-gray-500 italic">Transcription results will appear here...</p>
+                    </div>
+                </div>
+
+                <!-- Medical Image Analysis -->
+                <div class="glass-card">
+                    <div class="flex items-center mb-6">
+                        <div class="service-icon mr-4">🔬</div>
+                        <div>
+                            <h2 class="text-2xl font-semibold">Medical Image Analysis</h2>
+                            <p class="text-gray-400">AWS Bedrock AI Integration</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium mb-2">Upload DICOM or Medical Image:</label>
+                        <input type="file" id="image-upload" accept="image/*,.dcm,.dicom" 
+                               class="w-full p-3 border border-gray-300 rounded-lg">
+                        
+                        <button onclick="analyzeMedicalImage()" 
+                                class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg">
+                            🔍 Analyze Image
+                        </button>
+                    </div>
+
+                    <div id="image-analysis-status" class="text-gray-600 mb-4">Ready to analyze</div>
+                    
+                    <div id="image-analysis-result" class="min-h-32 bg-gray-50 p-4 rounded-lg">
+                        <p class="text-gray-500 italic">Analysis results will appear here...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clinical NLP Tool -->
+            <div class="glass-card mb-12">
+                <div class="flex items-center mb-6">
+                    <div class="service-icon mr-4">🧠</div>
+                    <div>
+                        <h2 class="text-2xl font-semibold">Clinical Natural Language Processing</h2>
+                        <p class="text-gray-400">AWS Comprehend Medical Integration</p>
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="space-y-4">
+                        <label class="block text-sm font-medium">Enter Medical Text:</label>
+                        <textarea id="nlp-text" rows="8" 
+                                  placeholder="Enter clinical notes, patient records, or medical text for analysis..."
+                                  class="w-full p-4 border border-gray-300 rounded-xl bg-white/10 backdrop-blur-sm text-white placeholder-gray-400"></textarea>
+                        
+                        <button onclick="analyzeNLPText()" 
+                                class="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded-xl font-medium transition-all duration-300 hover:shadow-lg">
+                            🔍 Extract Medical Entities
+                        </button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div id="nlp-status" class="text-gray-400">Ready to analyze</div>
+                        
+                        <div id="nlp-result" class="min-h-64 bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-white/10">
+                            <p class="text-gray-400 italic">Medical entities will appear here...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Assistant Chat -->
+            <div class="glass-card">
+                <div class="flex items-center mb-6">
+                    <div class="service-icon mr-4">💬</div>
+                    <div>
+                        <h2 class="text-2xl font-semibold">Medical AI Assistant</h2>
+                        <p class="text-gray-400">AWS Bedrock Powered Medical Consultation</p>
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="space-y-4">
+                        <label class="block text-sm font-medium">Ask Medical Questions:</label>
+                        <textarea id="ai-question" rows="6" 
+                                  placeholder="Ask about symptoms, treatments, drug interactions, etc..."
+                                  class="w-full p-4 border border-gray-300 rounded-xl bg-white/10 backdrop-blur-sm text-white placeholder-gray-400"></textarea>
+                        
+                        <button onclick="askMedicalAI()" 
+                                class="w-full bg-purple-600 hover:bg-purple-700 text-white px-6 py-4 rounded-xl font-medium transition-all duration-300 hover:shadow-lg">
+                            🤖 Ask AI Assistant
+                        </button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div id="ai-status" class="text-gray-400">Ready to help</div>
+                        
+                        <div id="ai-result" class="min-h-64 bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-white/10">
+                            <p class="text-gray-400 italic">AI responses will appear here...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="aws-config.js"></script>
+    <script src="aws-integration.js"></script>
+    <script src="aws-identity.js"></script>
+    <script src="aws-workflows.js"></script>
+    <script src="data-manager.js"></script>
+    <script src="navigation-handler.js"></script>
+    <script src="router.js"></script>
+    
+    <script>
+        let isRecording = false;
+        let mediaRecorder;
+        let audioChunks = [];
+
+        // Initialize AI Tools
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check authentication
+            if (!localStorage.getItem('accessToken')) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            const currentUser = localStorage.getItem('currentUser');
+            document.getElementById('current-user').textContent = `Welcome, ${currentUser}`;
+            
+            // Initialize AI services
+            await initializeAIServices();
+            
+            // Setup event listeners
+            setupEventListeners();
+        });
+
+        async function initializeAIServices() {
+            try {
+                // Log AI tools access
+                if (window.awsIntegration) {
+                    await awsIntegration.logActivity('ai_tools_access', {
+                        timestamp: new Date().toISOString()
+                    });
+                }
+                
+                console.log('✅ AI Tools initialized');
+            } catch (error) {
+                console.error('AI Tools initialization error:', error);
+            }
+        }
+
+        function setupEventListeners() {
+            // Audio upload handler
+            document.getElementById('audio-upload').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    processAudioFile(file);
+                }
+            });
+
+            // Image upload handler
+            document.getElementById('image-upload').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    console.log('Image selected:', file.name);
+                }
+            });
+        }
+
+        // Medical Transcription Functions
+        async function startMedicalTranscription() {
+            const button = document.getElementById('start-transcription-btn');
+            const status = document.getElementById('transcription-status');
+            
+            try {
+                if (!isRecording) {
+                    // Start recording
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    
+                    mediaRecorder.ondataavailable = (event) => {
+                        audioChunks.push(event.data);
+                    };
+                    
+                    mediaRecorder.onstop = async () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        await processAudioFile(audioBlob);
+                    };
+                    
+                    mediaRecorder.start();
+                    isRecording = true;
+                    
+                    button.innerHTML = '⏹️ Stop Recording';
+                    button.className = 'bg-gray-600 hover:bg-gray-700 text-white px-8 py-4 rounded-full text-lg font-medium transition-colors';
+                    status.textContent = 'Recording... Click stop when finished';
+                    
+                } else {
+                    // Stop recording
+                    mediaRecorder.stop();
+                    mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                    isRecording = false;
+                    
+                    button.innerHTML = '🎤 Start Recording';
+                    button.className = 'bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-full text-lg font-medium transition-colors';
+                    status.textContent = 'Processing recording...';
+                }
+                
+            } catch (error) {
+                console.error('Recording error:', error);
+                status.textContent = 'Recording failed: ' + error.message;
+                showError('Microphone access denied or not available');
+            }
+        }
+
+        async function processAudioFile(audioBlob) {
+            const status = document.getElementById('transcription-status');
+            const progress = document.getElementById('transcription-progress');
+            const result = document.getElementById('transcription-result');
+            
+            try {
+                // Update progress
+                updateProgress(progress, 20);
+                status.textContent = 'Uploading to AWS S3...';
+                
+                // Upload to S3
+                const uploadResult = await awsIntegration.uploadFile(audioBlob, 'medical-audio', {
+                    contentType: 'audio/wav',
+                    purpose: 'medical-transcription'
+                });
+                
+                updateProgress(progress, 50);
+                status.textContent = 'Processing with AWS HealthScribe...';
+                
+                // Transcribe with AWS
+                const transcriptionResult = await awsServices.transcribeAudio(audioBlob);
+                
+                updateProgress(progress, 80);
+                status.textContent = 'Extracting medical entities...';
+                
+                // Extract medical entities
+                const entities = await awsServices.extractMedicalEntities(transcriptionResult.transcript);
+                
+                updateProgress(progress, 100);
+                status.textContent = 'Transcription completed successfully';
+                
+                // Display results
+                displayTranscriptionResults(transcriptionResult, entities);
+                
+                // Log activity
+                await awsIntegration.logActivity('medical_transcription', {
+                    confidence: transcriptionResult.confidence,
+                    entitiesFound: entities.entities.length
+                });
+                
+                // Reset progress after delay
+                setTimeout(() => updateProgress(progress, 0), 3000);
+                
+            } catch (error) {
+                console.error('Transcription processing error:', error);
+                status.textContent = 'Transcription failed: ' + error.message;
+                showError('Transcription processing failed');
+                updateProgress(progress, 0);
+            }
+        }
+
+        function displayTranscriptionResults(transcription, entities) {
+            const container = document.getElementById('transcription-result');
+            
+            container.innerHTML = `
+                <div class="transcription-results">
+                    <h4 class="font-semibold mb-3">AWS HealthScribe Results</h4>
+                    <div class="bg-white p-4 rounded-lg border mb-4">
+                        <p class="text-gray-800">${transcription.transcript}</p>
+                        <div class="mt-2 text-sm text-gray-600">
+                            Confidence: ${(transcription.confidence * 100).toFixed(1)}%
+                        </div>
+                    </div>
+                    
+                    <h5 class="font-semibold mb-2">Medical Entities Found:</h5>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        ${entities.entities.map(entity => `
+                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
+                                ${entity.Text} (${entity.Type})
+                            </span>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="text-sm ${entities.phi.length === 0 ? 'text-green-600' : 'text-orange-600'}">
+                        ${entities.phi.length === 0 ? '✓ No PHI detected' : `⚠️ ${entities.phi.length} PHI items detected`}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Medical Image Analysis Functions
+        async function analyzeMedicalImage() {
+            const fileInput = document.getElementById('image-upload');
+            const status = document.getElementById('image-analysis-status');
+            const result = document.getElementById('image-analysis-result');
+            
+            if (!fileInput.files[0]) {
+                showError('Please select an image file first');
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            
+            try {
+                status.textContent = 'Uploading image to AWS S3...';
+                
+                // Upload to S3
+                const uploadResult = await awsIntegration.uploadFile(file, 'medical-images', {
+                    contentType: file.type,
+                    purpose: 'medical-analysis'
+                });
+                
+                status.textContent = 'Analyzing with AWS Bedrock AI...';
+                
+                // Analyze with AWS Bedrock
+                const analysisResult = await awsServices.analyzeDICOM(file);
+                
+                status.textContent = 'Analysis completed';
+                
+                // Display results
+                result.innerHTML = `
+                    <div class="analysis-results">
+                        <h4 class="font-semibold mb-3">AWS Bedrock Analysis</h4>
+                        <div class="bg-white p-4 rounded-lg border">
+                            <h5 class="font-medium mb-2">Findings:</h5>
+                            <ul class="list-disc list-inside mb-3">
+                                ${analysisResult.findings.map(finding => `<li>${finding}</li>`).join('')}
+                            </ul>
+                            <div class="text-sm text-gray-600">
+                                Confidence: ${(analysisResult.confidence * 100).toFixed(1)}%
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Log activity
+                await awsIntegration.logActivity('medical_image_analysis', {
+                    fileName: file.name,
+                    fileSize: file.size,
+                    confidence: analysisResult.confidence
+                });
+                
+            } catch (error) {
+                console.error('Image analysis error:', error);
+                status.textContent = 'Analysis failed: ' + error.message;
+                showError('Image analysis failed');
+            }
+        }
+
+        // Clinical NLP Functions
+        async function analyzeNLPText() {
+            const textInput = document.getElementById('nlp-text');
+            const status = document.getElementById('nlp-status');
+            const result = document.getElementById('nlp-result');
+            
+            if (!textInput.value.trim()) {
+                showError('Please enter medical text to analyze');
+                return;
+            }
+            
+            try {
+                status.textContent = 'Analyzing with AWS Comprehend Medical...';
+                
+                // Extract medical entities
+                const entities = await awsServices.extractMedicalEntities(textInput.value);
+                
+                status.textContent = 'Analysis completed';
+                
+                // Display results
+                result.innerHTML = `
+                    <div class="nlp-results">
+                        <h4 class="font-semibold mb-3">AWS Comprehend Medical Results</h4>
+                        
+                        <div class="mb-4">
+                            <h5 class="font-medium mb-2">Medical Entities:</h5>
+                            <div class="grid gap-2">
+                                ${entities.entities.map(entity => `
+                                    <div class="bg-white p-2 rounded border flex justify-between">
+                                        <span class="font-medium">${entity.Text}</span>
+                                        <span class="text-sm text-gray-600">${entity.Type} (${(entity.Score * 100).toFixed(1)}%)</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="text-sm ${entities.phi.length === 0 ? 'text-green-600' : 'text-orange-600'}">
+                            ${entities.phi.length === 0 ? '✓ No PHI detected' : `⚠️ ${entities.phi.length} PHI items detected`}
+                        </div>
+                    </div>
+                `;
+                
+                // Log activity
+                await awsIntegration.logActivity('clinical_nlp_analysis', {
+                    textLength: textInput.value.length,
+                    entitiesFound: entities.entities.length
+                });
+                
+            } catch (error) {
+                console.error('NLP analysis error:', error);
+                status.textContent = 'Analysis failed: ' + error.message;
+                showError('NLP analysis failed');
+            }
+        }
+
+        // Medical AI Assistant Functions
+        async function askMedicalAI() {
+            const questionInput = document.getElementById('ai-question');
+            const status = document.getElementById('ai-status');
+            const result = document.getElementById('ai-result');
+            
+            if (!questionInput.value.trim()) {
+                showError('Please enter a medical question');
+                return;
+            }
+            
+            try {
+                status.textContent = 'Consulting AWS Bedrock AI...';
+                
+                // Use AWS Bedrock for medical AI assistance
+                const aiResponse = await awsServices.invokeLambdaFunction('medical-ai-assistant', {
+                    question: questionInput.value,
+                    context: 'medical_consultation'
+                });
+                
+                status.textContent = 'AI consultation completed';
+                
+                // Display AI response
+                result.innerHTML = `
+                    <div class="ai-response">
+                        <h4 class="font-semibold mb-3">Medical AI Assistant Response</h4>
+                        <div class="bg-white p-4 rounded-lg border">
+                            <p class="text-gray-800 leading-relaxed">${aiResponse.body.response || 'AI response not available in simulation mode'}</p>
+                            <div class="mt-3 text-sm text-orange-600">
+                                ⚠️ This is for informational purposes only. Always consult with healthcare professionals.
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Log activity
+                await awsIntegration.logActivity('medical_ai_consultation', {
+                    questionLength: questionInput.value.length
+                });
+                
+            } catch (error) {
+                console.error('AI consultation error:', error);
+                status.textContent = 'AI consultation failed: ' + error.message;
+                showError('AI consultation failed');
+            }
+        }
+
+        // Utility Functions
+        function updateProgress(progressBar, percentage) {
+            progressBar.style.width = percentage + '%';
+        }
+
+        function showError(message) {
+            if (window.identityManager) {
+                identityManager.showUINotification(message, 'error');
+            } else {
+                alert(message);
+            }
+        }
+
+        function showSuccess(message) {
+            if (window.identityManager) {
+                identityManager.showUINotification(message, 'success');
+            } else {
+                alert(message);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('idToken');
+            localStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

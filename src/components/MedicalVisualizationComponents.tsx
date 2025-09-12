@@ -179,8 +179,9 @@ export const PatientDistributionChart: React.FC<{
         {data.map((item) => (
           <div key={item.category} className="flex items-center">
             <div
-              className="w-3 h-3 rounded-full mr-2"
-              style={{ backgroundColor: item.color }}
+              className="w-3 h-3 rounded-full mr-2 color-indicator"
+              data-color={item.color}
+              style={{ '--indicator-color': item.color } as React.CSSProperties}
             />
             <span className="text-sm text-gray-600 dark:text-gray-300">
               {item.category}: {item.value}

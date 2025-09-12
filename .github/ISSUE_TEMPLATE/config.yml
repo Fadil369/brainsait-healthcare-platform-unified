@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security reports
+    url: mailto:security@brainsait.com
+    about: Report urgent vulnerabilities privately to the security team.

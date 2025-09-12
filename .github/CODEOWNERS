@@ -1,0 +1,15 @@
+# CODEOWNERS
+# Assign default reviewers for changes in this repo.
+# Replace the placeholders below with your actual GitHub org/team or usernames.
+
+# Everything in the repo — set to a team or list of users
+# *       @your-org/healthcare-maintainers @your-username
+
+# Critical areas (examples)
+# src/app/            @your-org/web-team
+# src/lib/            @your-org/platform-team
+# src/app/api/        @your-org/backend-team
+# infrastructure/     @your-org/devops-team
+# deploy/             @your-org/devops-team
+
+# NOTE: Update this file to take effect. Commented lines are examples.

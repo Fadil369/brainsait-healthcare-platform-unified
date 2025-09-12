@@ -24,3 +24,12 @@ pnpm-debug.log*
 coverage/
 .cache/
 next-env.d.ts
+
+# Local security follow-ups store
+.security/followups.json
+
+# Local security pipelines and inbox (may contain sensitive metadata)
+.security/inbox/
+.security/pipelines/
+.security/owners.json
+.security/resolved.json

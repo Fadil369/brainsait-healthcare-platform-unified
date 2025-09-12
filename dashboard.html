@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Dashboard - BrainSAIT</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    <div class="bg-mesh"></div>
+
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="nav-brand">
+                    <div class="nav-logo">🏥</div>
+                    <div class="nav-title">BrainSAIT</div>
+                </div>
+                <div class="nav-links">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="dashboard.html" class="nav-link">Dashboard</a>
+                    <a href="ai-tools.html" class="nav-link">AI Tools</a>
+                    <a href="analytics.html" class="nav-link">Analytics</a>
+                    <a href="admin.html" class="nav-link">Admin</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main">
+        <section class="hero" style="padding: 2rem 0;">
+            <div class="container">
+                <h1 class="section-title">🏥 Healthcare Dashboard</h1>
+                <p class="section-description">Real-time healthcare operations monitoring</p>
+                
+                <div class="metrics-grid" style="margin-top: 2rem;">
+                    <div class="metric-card glass">
+                        <div class="metric-value" id="patients-today">89</div>
+                        <div class="metric-label">Patients Today</div>
+                    </div>
+                    <div class="metric-card glass">
+                        <div class="metric-value" id="appointments">156</div>
+                        <div class="metric-label">Appointments</div>
+                    </div>
+                    <div class="metric-card glass">
+                        <div class="metric-value" id="revenue">$47.2K</div>
+                        <div class="metric-label">Revenue</div>
+                    </div>
+                    <div class="metric-card glass">
+                        <div class="metric-value" id="efficiency">87%</div>
+                        <div class="metric-label">Efficiency</div>
+                    </div>
+                </div>
+
+                <div class="services-grid" style="margin-top: 3rem;">
+                    <div class="service-card glass-strong" onclick="openPatientManagement()">
+                        <div class="service-header">
+                            <div class="service-icon">👥</div>
+                            <div class="service-info">
+                                <h3>Patient Management</h3>
+                                <div class="service-status">
+                                    <div class="status-dot"></div>
+                                    Active
+                                </div>
+                            </div>
+                        </div>
+                        <p class="service-description">Manage patient records and appointments</p>
+                    </div>
+
+                    <div class="service-card glass-strong" onclick="openAppointments()">
+                        <div class="service-header">
+                            <div class="service-icon">📅</div>
+                            <div class="service-info">
+                                <h3>Appointments</h3>
+                                <div class="service-status">
+                                    <div class="status-dot"></div>
+                                    Active
+                                </div>
+                            </div>
+                        </div>
+                        <p class="service-description">Schedule and manage appointments</p>
+                    </div>
+
+                    <div class="service-card glass-strong" onclick="openBilling()">
+                        <div class="service-header">
+                            <div class="service-icon">💰</div>
+                            <div class="service-info">
+                                <h3>Billing & Claims</h3>
+                                <div class="service-status">
+                                    <div class="status-dot"></div>
+                                    Processing
+                                </div>
+                            </div>
+                        </div>
+                        <p class="service-description">Process billing and insurance claims</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function openPatientManagement() {
+            alert('Patient Management:\n\n• View patient records\n• Update medical history\n• Manage demographics\n• Track treatment plans\n• HIPAA compliant access');
+        }
+
+        function openAppointments() {
+            alert('Appointment System:\n\n• Schedule new appointments\n• View daily calendar\n• Send reminders\n• Manage cancellations\n• Resource allocation');
+        }
+
+        function openBilling() {
+            alert('Billing & Claims:\n\n• Generate invoices\n• Process insurance claims\n• Track payments\n• NPHIES integration\n• Financial reporting');
+        }
+
+        // Update metrics every 30 seconds
+        setInterval(() => {
+            document.getElementById('patients-today').textContent = Math.floor(85 + Math.random() * 10);
+            document.getElementById('appointments').textContent = Math.floor(150 + Math.random() * 20);
+            document.getElementById('revenue').textContent = '$' + (45 + Math.random() * 10).toFixed(1) + 'K';
+            document.getElementById('efficiency').textContent = Math.floor(85 + Math.random() * 5) + '%';
+        }, 30000);
+        
+        // Enhanced dashboard with real data integration
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check authentication
+            if (!localStorage.getItem('accessToken')) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Initialize dashboard with real data
+            await initializeRealDashboard();
+        });
+        
+        async function initializeRealDashboard() {
+            try {
+                // Show loading state
+                showLoadingState();
+                
+                // Load real patient data
+                const patientData = await realDataManager.getRealPatientData();
+                updatePatientMetrics(patientData);
+                
+                // Load real activities
+                await loadRealActivities();
+                
+                // Start real-time monitoring
+                startRealTimeMonitoring();
+                
+                // Log dashboard access
+                if (window.awsIntegration) {
+                    await awsIntegration.logActivity('dashboard_access', {
+                        timestamp: new Date().toISOString()
+                    });
+                }
+                
+                // Hide loading state
+                hideLoadingState();
+                
+            } catch (error) {
+                console.error('Dashboard initialization error:', error);
+                showErrorState('Failed to load dashboard data: ' + error.message);
+            }
+        }
+        
+        function updatePatientMetrics(data) {
+            // Update with real data
+            const elements = {
+                'total-patients': data.totalPatients,
+                'active-today': data.activeToday,
+                'critical-alerts': data.criticalAlerts,
+                'avg-wait-time': data.avgWaitTime + ' min'
+            };
+            
+            Object.entries(elements).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                    element.classList.add('updated');
+                }
+            });
+        }
+        
+        async function loadRealActivities() {
+            try {
+                const activities = await awsIntegration.queryData('patient-activities', {
+                    Limit: 10,
+                    ScanIndexForward: false
+                });
+                
+                const container = document.getElementById('recent-activities');
+                if (container && activities.length > 0) {
+                    container.innerHTML = activities.map(activity => `
+                        <div class="activity-item">
+                            <div class="activity-text">${activity.description}</div>
+                            <div class="activity-time">${new Date(activity.timestamp).toLocaleTimeString()}</div>
+                        </div>
+                    `).join('');
+                } else if (container) {
+                    container.innerHTML = '<p class="text-gray-500">No recent activities found</p>';
+                }
+            } catch (error) {
+                console.error('Activities loading error:', error);
+            }
+        }
+        
+        function startRealTimeMonitoring() {
+            // Update metrics every 30 seconds with real data
+            setInterval(async () => {
+                try {
+                    const patientData = await realDataManager.getRealPatientData();
+                    updatePatientMetrics(patientData);
+                    
+                    // Publish real-time metric
+                    await awsIntegration.publishMetric('DashboardRefresh', 1);
+                } catch (error) {
+                    console.error('Real-time update error:', error);
+                }
+            }, 30000);
+        }
+        
+        function showLoadingState() {
+            const metrics = document.querySelectorAll('.metric-value');
+            metrics.forEach(metric => {
+                metric.textContent = 'Loading...';
+                metric.classList.add('loading');
+            });
+        }
+        
+        function hideLoadingState() {
+            const metrics = document.querySelectorAll('.metric-value');
+            metrics.forEach(metric => {
+                metric.classList.remove('loading');
+            });
+        }
+        
+        function showErrorState(message) {
+            const container = document.querySelector('.dashboard-container');
+            if (container) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-state';
+                errorDiv.innerHTML = `
+                    <div class="error-message">
+                        <h3>⚠️ Dashboard Error</h3>
+                        <p>${message}</p>
+                        <button onclick="window.location.reload()" class="retry-btn">Retry</button>
+                    </div>
+                `;
+                container.prepend(errorDiv);
+            }
+        }
+    </script>
+    
+    <!-- Real Data Integration Scripts -->
+    <script src="aws-config.js"></script>
+    <script src="aws-integration.js"></script>
+    <script src="aws-identity.js"></script>
+    <script src="data-manager.js"></script>
+    <script src="navigation-handler.js"></script>
+    <script src="router.js"></script>
+</body>
+</html>
