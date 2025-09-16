@@ -59,7 +59,7 @@
   "dependencies": {
     "@aws-sdk/client-bedrock-runtime": "^3.886.0",
     "@aws-sdk/client-comprehendmedical": "^3.886.0",
-    "@aws-sdk/client-lambda": "^3.886.0",
+    "@aws-sdk/client-lambda": "^3.888.0",
     "@aws-sdk/client-medical-imaging": "^3.886.0",
     "@aws-sdk/client-s3": "^3.886.0",
     "@aws-sdk/client-textract": "^3.886.0",
