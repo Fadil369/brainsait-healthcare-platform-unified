@@ -1,0 +1,35 @@
+tunnel: brainsait-healthcare
+credentials-file: /root/.cloudflared/credentials.json
+
+ingress:
+  # Healthcare Platform Main App
+  - hostname: brainsait.com
+    service: http://brainsait-app:3000
+    originRequest:
+      httpHostHeader: brainsait.com
+      
+  - hostname: www.brainsait.com
+    service: http://brainsait-app:3000
+    originRequest:
+      httpHostHeader: www.brainsait.com
+
+  # API Endpoints
+  - hostname: api.brainsait.com
+    service: http://brainsait-app:3000
+    originRequest:
+      httpHostHeader: api.brainsait.com
+
+  # Health Check
+  - hostname: health.brainsait.com
+    service: http://brainsait-app:3000/api/health
+    originRequest:
+      httpHostHeader: health.brainsait.com
+
+  # NPHIES Saudi Integration
+  - hostname: nphies.brainsait.com
+    service: http://brainsait-app:3000
+    originRequest:
+      httpHostHeader: nphies.brainsait.com
+
+  # Catch-all rule
+  - service: http_status:404

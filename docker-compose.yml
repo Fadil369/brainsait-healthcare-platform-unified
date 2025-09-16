@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  brainsait-app:
+    build: .
+    container_name: brainsait-healthcare
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+      - AWS_REGION=us-east-1
+      - NPHIES_BASE_URL=https://nphies.sa/fhir/R4
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - brainsait-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: brainsait-tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    networks:
+      - brainsait-network
+    depends_on:
+      - brainsait-app
+
+  nginx:
+    image: nginx:alpine
+    container_name: brainsait-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    networks:
+      - brainsait-network
+    depends_on:
+      - brainsait-app
+
+networks:
+  brainsait-network:
+    driver: bridge

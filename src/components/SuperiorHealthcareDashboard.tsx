@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 import { useToast } from "@/components/ToastProvider";
+import { apiClient, type DashboardMetrics, type PatientRecord as ApiPatientRecord } from "@/lib/api-client";
 import {
   AIPerformanceChart,
   MedicalAlertTimeline,
@@ -68,12 +69,12 @@ interface NotificationItem {
 interface PatientRecord {
   id: string;
   name: string;
-  nameAr: string;
+  nameAr?: string;
   age: number;
-  gender: "M" | "F";
+  gender: "M" | "F" | "male" | "female";
   condition: string;
   severity: "low" | "medium" | "high" | "critical";
-  lastVisit: string;
+  lastVisit?: string;
   nextAppointment?: string;
   assignedDoctor: string;
   roomNumber?: string;
@@ -86,7 +87,7 @@ interface PatientRecord {
   };
   medications: string[];
   allergies: string[];
-  status: "active" | "discharged" | "transferred";
+  status: "active" | "discharged" | "transferred" | "critical" | "admitted" | "stable";
 }
 
 interface SystemMetrics {
@@ -244,54 +245,48 @@ const SuperiorHealthcareDashboard: React.FC = () => {
     try {
       setState((prev) => ({ ...prev, loading: true }));
 
-      // Simulate API calls
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      // Load dashboard metrics from API
+      const metricsResponse = await apiClient.getDashboardMetrics();
+      if (metricsResponse.success && metricsResponse.data) {
+        // Convert API data to match existing interface
+        const apiData = metricsResponse.data;
+        setMetrics({
+          patients: {
+            total: apiData.patients.total,
+            active: apiData.patients.admitted,
+            critical: apiData.patients.critical,
+            newToday: apiData.patients.discharged,
+            trend: apiData.patients.trend,
+          },
+          appointments: {
+            total: apiData.appointments.total,
+            today: apiData.appointments.today,
+            upcoming: apiData.appointments.upcoming,
+            completed: apiData.appointments.completed,
+            cancelled: apiData.appointments.cancelled,
+            trend: apiData.appointments.trend,
+          },
+          revenue: {
+            total: apiData.revenue.total,
+            monthly: apiData.revenue.monthly,
+            weekly: apiData.revenue.weekly,
+            daily: apiData.revenue.daily,
+            claims: apiData.revenue.claims,
+            trend: apiData.revenue.trend,
+          },
+          aiPerformance: apiData.aiPerformance,
+          compliance: apiData.compliance,
+          systemHealth: apiData.systemHealth,
+        });
+      }
 
-      setMetrics({
-        patients: {
-          total: 18547,
-          active: 14230,
-          critical: 27,
-          newToday: 89,
-          trend: 14.2,
-        },
-        appointments: {
-          total: 567,
-          today: 124,
-          upcoming: 289,
-          completed: 154,
-          cancelled: 12,
-          trend: 9.8,
-        },
-        revenue: {
-          total: 5420000,
-          monthly: 780000,
-          weekly: 185000,
-          daily: 26400,
-          claims: 1567,
-          trend: 18.5,
-        },
-        aiPerformance: {
-          accuracy: 96.8,
-          predictions: 1489,
-          automated: 91.2,
-          efficiency: 95.7,
-        },
-        compliance: {
-          hipaa: 99.2,
-          nphies: 97.1,
-          security: 98.8,
-          audit: 95.4,
-        },
-        systemHealth: {
-          cpuUsage: Math.random() * 20 + 35,
-          memoryUsage: Math.random() * 25 + 55,
-          apiLatency: Math.random() * 50 + 100,
-          errorRate: Math.random() * 0.1,
-        },
-      });
-
-      setPatients([
+      // Load patient records
+      const patientsResponse = await apiClient.getPatientRecords();
+      if (patientsResponse.success && patientsResponse.data) {
+        setPatients(patientsResponse.data);
+      } else {
+        // Fallback data if API fails
+        setPatients([
         {
           id: "P001",
           name: "Ahmed Mohammed Al-Rashid",
@@ -360,8 +355,10 @@ const SuperiorHealthcareDashboard: React.FC = () => {
           allergies: ["Shellfish", "Sulfa"],
           status: "active",
         },
-      ]);
+        ]);
+      }
 
+      // Mock notifications - could be replaced with API call
       setState((prev) => ({
         ...prev,
         notifications: [
