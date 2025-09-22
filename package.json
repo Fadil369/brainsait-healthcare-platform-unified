@@ -64,7 +64,7 @@
     "@aws-sdk/client-s3": "^3.886.0",
     "@aws-sdk/client-textract": "^3.886.0",
     "@aws-sdk/client-transcribe": "^3.886.0",
-    "@aws-sdk/client-transcribe-streaming": "^3.886.0",
+    "@aws-sdk/client-transcribe-streaming": "^3.893.0",
     "@formatjs/intl-locale": "^4.2.11",
     "@prisma/client": "^5.0.0",
     "@stripe/stripe-js": "^2.0.0",
