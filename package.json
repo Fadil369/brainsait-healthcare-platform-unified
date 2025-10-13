@@ -57,7 +57,7 @@
   "author": "BrainSAIT Healthcare Team",
   "license": "MIT",
   "dependencies": {
-    "@aws-sdk/client-bedrock-runtime": "^3.886.0",
+    "@aws-sdk/client-bedrock-runtime": "^3.908.0",
     "@aws-sdk/client-comprehendmedical": "^3.886.0",
     "@aws-sdk/client-lambda": "^3.886.0",
     "@aws-sdk/client-medical-imaging": "^3.886.0",
