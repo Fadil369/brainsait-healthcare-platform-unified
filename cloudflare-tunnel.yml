@@ -1,35 +1,97 @@
 tunnel: brainsait-healthcare
 credentials-file: /root/.cloudflared/credentials.json
 
+# Global tunnel configuration
+protocol: quic
+logfile: /var/log/cloudflared.log
+loglevel: info
+metrics: 0.0.0.0:2000
+
+# Connection settings for reliability
+connections:
+  count: 4
+  retry-delay: 5s
+  max-retry-duration: 15m
+
+# Origin configuration defaults
+originRequest:
+  connectTimeout: 30s
+  tlsTimeout: 10s
+  tcpKeepAlive: 30s
+  noHappyEyeballs: false
+  keepAliveTimeout: 90s
+  keepAliveConnections: 100
+  httpHostHeader: auto
+  originServerName: brainsait.com
+  caPool: /etc/ssl/certs/ca-certificates.crt
+  noTLSVerify: false
+  disableChunkedEncoding: false
+  bastionMode: false
+  proxyAddress: 127.0.0.1
+  proxyPort: 0
+  proxyType: ""
+  http2Origin: true
+
 ingress:
   # Healthcare Platform Main App
   - hostname: brainsait.com
     service: http://brainsait-app:3000
     originRequest:
       httpHostHeader: brainsait.com
+      connectTimeout: 30s
+      noTLSVerify: false
+      http2Origin: true
       
   - hostname: www.brainsait.com
     service: http://brainsait-app:3000
     originRequest:
       httpHostHeader: www.brainsait.com
+      connectTimeout: 30s
+      http2Origin: true
 
-  # API Endpoints
+  # API Endpoints with longer timeout for data processing
   - hostname: api.brainsait.com
     service: http://brainsait-app:3000
     originRequest:
       httpHostHeader: api.brainsait.com
+      connectTimeout: 60s
+      keepAliveTimeout: 120s
+      http2Origin: true
 
-  # Health Check
+  # Health Check with short timeout
   - hostname: health.brainsait.com
     service: http://brainsait-app:3000/api/health
     originRequest:
       httpHostHeader: health.brainsait.com
+      connectTimeout: 10s
+      tlsTimeout: 5s
+      http2Origin: true
 
-  # NPHIES Saudi Integration
+  # NPHIES Saudi Integration with extended timeout
   - hostname: nphies.brainsait.com
     service: http://brainsait-app:3000
     originRequest:
       httpHostHeader: nphies.brainsait.com
+      connectTimeout: 90s
+      keepAliveTimeout: 180s
+      http2Origin: true
+
+  # Static assets with aggressive caching
+  - hostname: static.brainsait.com
+    service: http://brainsait-app:3000
+    originRequest:
+      httpHostHeader: static.brainsait.com
+      connectTimeout: 15s
+      http2Origin: true
+      disableChunkedEncoding: false
+
+  # Admin portal with security headers
+  - hostname: admin.brainsait.com
+    service: http://brainsait-app:3000
+    originRequest:
+      httpHostHeader: admin.brainsait.com
+      connectTimeout: 30s
+      http2Origin: true
 
   # Catch-all rule
   - service: http_status:404

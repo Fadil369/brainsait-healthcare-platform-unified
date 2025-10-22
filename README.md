@@ -193,17 +193,57 @@ npm run lint
 
 ## 📦 Deployment
 
+### Enhanced Cloudflare Tunnel Deployment (Recommended)
+
+The platform includes an enhanced Cloudflare Tunnel configuration with:
+- **QUIC Protocol**: Modern UDP-based protocol for 30% faster connections
+- **4 Persistent Connections**: Load distribution and failover
+- **HTTP/2 Origin Support**: Multiplexed requests, header compression
+- **Comprehensive Monitoring**: Prometheus metrics on port 2000
+- **Resource Management**: CPU/memory limits, health checks
+- **Security**: TLS verification, DDoS protection, WAF integration
+
+**Quick Deploy:**
+```bash
+# Configure environment
+cp .env.example .env
+# Edit .env and set CLOUDFLARE_TUNNEL_TOKEN
+
+# Deploy with automated script
+./scripts/deploy-cloudflare.sh production
+
+# Or manually with docker-compose
+docker-compose up -d
+
+# Verify deployment
+curl http://localhost:2000/metrics  # Tunnel metrics
+curl https://brainsait.com          # Public endpoint
+```
+
+**Documentation:**
+- Complete guide: `docs/CLOUDFLARE-DEPLOYMENT-ENHANCED.md`
+- Monitoring setup: `monitoring/prometheus.yml`
+- Alert rules: `monitoring/rules/alerts.yml`
+
+**Configured Endpoints:**
+- Main: `https://brainsait.com`
+- API: `https://api.brainsait.com`
+- Health: `https://health.brainsait.com`
+- NPHIES: `https://nphies.brainsait.com`
+- Static: `https://static.brainsait.com`
+- Admin: `https://admin.brainsait.com`
+
 ### AWS Deployment
 ```bash
 npm run deploy:aws
 ```
 
-### Cloudflare Pages
+### Cloudflare Pages (Static Export)
 ```bash
 npm run deploy:cloudflare
 ```
 
-### Docker
+### Docker (Standalone)
 ```bash
 docker build -t brainsait-healthcare .
 docker run -p 3000:3000 brainsait-healthcare

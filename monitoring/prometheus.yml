@@ -1,0 +1,67 @@
+# Prometheus Configuration for Cloudflare Tunnel Monitoring
+# This file configures Prometheus to scrape metrics from the Cloudflare tunnel
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'brainsait-healthcare'
+    environment: 'production'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - 'alertmanager:9093'
+
+# Load rules once and periodically evaluate them
+rule_files:
+  - '/etc/prometheus/rules/*.yml'
+
+# Scrape configurations
+scrape_configs:
+  # Cloudflare Tunnel Metrics
+  - job_name: 'cloudflared'
+    static_configs:
+      - targets: ['cloudflared:2000']
+        labels:
+          service: 'cloudflare-tunnel'
+          component: 'edge'
+    metric_relabel_configs:
+      # Keep only cloudflared metrics
+      - source_labels: [__name__]
+        regex: 'cloudflared_.*'
+        action: keep
+
+  # Application Health Metrics
+  - job_name: 'brainsait-app'
+    metrics_path: '/api/health'
+    static_configs:
+      - targets: ['brainsait-app:3000']
+        labels:
+          service: 'healthcare-platform'
+          component: 'application'
+    scrape_interval: 30s
+
+  # Node Exporter (if you add it)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+        labels:
+          service: 'infrastructure'
+          component: 'host-metrics'
+
+  # Docker Container Metrics (cAdvisor)
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+        labels:
+          service: 'infrastructure'
+          component: 'container-metrics'
+    scrape_interval: 30s
+    metric_relabel_configs:
+      # Drop unnecessary container metrics to reduce cardinality
+      - source_labels: [__name__]
+        regex: 'container_(network_tcp_usage_total|tasks_state|cpu_load_average_10s)'
+        action: drop

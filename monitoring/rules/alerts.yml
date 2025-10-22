@@ -1,0 +1,242 @@
+# Prometheus Alert Rules for Cloudflare Tunnel and Healthcare Platform
+
+groups:
+  - name: cloudflare_tunnel
+    interval: 30s
+    rules:
+      # Tunnel Connection Alerts
+      - alert: CloudflareTunnelDown
+        expr: up{job="cloudflared"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: cloudflare-tunnel
+        annotations:
+          summary: "Cloudflare Tunnel is down"
+          description: "The Cloudflare tunnel has been down for more than 2 minutes. All external traffic is blocked."
+
+      - alert: CloudflareTunnelConnectionsLow
+        expr: cloudflared_tunnel_total_connections < 2
+        for: 5m
+        labels:
+          severity: warning
+          component: cloudflare-tunnel
+        annotations:
+          summary: "Low tunnel connections"
+          description: "Only {{ $value }} tunnel connections active. Expected 4 for optimal performance."
+
+      - alert: CloudflareTunnelHighErrorRate
+        expr: rate(cloudflared_tunnel_request_errors[5m]) > 0.05
+        for: 3m
+        labels:
+          severity: warning
+          component: cloudflare-tunnel
+        annotations:
+          summary: "High error rate on Cloudflare tunnel"
+          description: "Error rate is {{ $value | humanizePercentage }} over the last 5 minutes."
+
+      # Request Performance Alerts
+      - alert: CloudflareTunnelHighLatency
+        expr: histogram_quantile(0.95, rate(cloudflared_tunnel_response_time_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          component: cloudflare-tunnel
+        annotations:
+          summary: "High tunnel response latency"
+          description: "95th percentile response time is {{ $value }}s, exceeding 2s threshold."
+
+      - alert: CloudflareTunnelHighRequestRate
+        expr: rate(cloudflared_tunnel_total_requests[1m]) > 1000
+        for: 5m
+        labels:
+          severity: info
+          component: cloudflare-tunnel
+        annotations:
+          summary: "High request rate"
+          description: "Request rate is {{ $value }} requests/second. Monitor for potential DDoS."
+
+  - name: application_health
+    interval: 30s
+    rules:
+      # Application Health Alerts
+      - alert: ApplicationDown
+        expr: up{job="brainsait-app"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: application
+        annotations:
+          summary: "Healthcare application is down"
+          description: "The main application has been unreachable for more than 2 minutes."
+
+      - alert: ApplicationUnhealthy
+        expr: health_check_status{job="brainsait-app"} == 0
+        for: 3m
+        labels:
+          severity: critical
+          component: application
+        annotations:
+          summary: "Application health check failing"
+          description: "Application health check has been failing for 3 minutes."
+
+      # Database Alerts
+      - alert: DatabaseConnectionsHigh
+        expr: database_connections_active > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "High database connections"
+          description: "Database has {{ $value }} active connections (threshold: 80)."
+
+      - alert: DatabaseSlowQueries
+        expr: rate(database_slow_queries_total[5m]) > 5
+        for: 3m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "High rate of slow database queries"
+          description: "{{ $value }} slow queries per second detected."
+
+  - name: security
+    interval: 1m
+    rules:
+      # Security Alerts
+      - alert: HighFailedAuthAttempts
+        expr: rate(auth_failed_attempts_total[5m]) > 10
+        for: 3m
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "High rate of failed authentication attempts"
+          description: "{{ $value }} failed auth attempts per second. Possible brute force attack."
+
+      - alert: SuspiciousAPIActivity
+        expr: rate(api_requests_total{status=~"4.*"}[5m]) > 50
+        for: 5m
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "High rate of 4xx errors"
+          description: "{{ $value }} client errors per second. Investigate for scanning/enumeration."
+
+      - alert: PHIAccessPatternAnomaly
+        expr: rate(phi_access_total[5m]) > 100
+        for: 5m
+        labels:
+          severity: critical
+          component: security
+          compliance: hipaa
+        annotations:
+          summary: "Unusual PHI access pattern detected"
+          description: "{{ $value }} PHI accesses per second exceeds normal baseline. Investigate immediately."
+
+  - name: nphies_integration
+    interval: 30s
+    rules:
+      # NPHIES Integration Alerts
+      - alert: NPHIESIntegrationDown
+        expr: nphies_api_available == 0
+        for: 5m
+        labels:
+          severity: critical
+          component: nphies
+        annotations:
+          summary: "NPHIES integration is down"
+          description: "Unable to reach NPHIES API for 5 minutes. Claims processing blocked."
+
+      - alert: NPHIESHighErrorRate
+        expr: rate(nphies_api_errors_total[5m]) / rate(nphies_api_requests_total[5m]) > 0.1
+        for: 3m
+        labels:
+          severity: warning
+          component: nphies
+        annotations:
+          summary: "High NPHIES error rate"
+          description: "Error rate is {{ $value | humanizePercentage }}. Check credentials and network."
+
+      - alert: NPHIESSlowResponse
+        expr: histogram_quantile(0.95, rate(nphies_request_duration_seconds_bucket[5m])) > 30
+        for: 5m
+        labels:
+          severity: warning
+          component: nphies
+        annotations:
+          summary: "NPHIES API responding slowly"
+          description: "95th percentile response time is {{ $value }}s, exceeding 30s threshold."
+
+  - name: resource_usage
+    interval: 30s
+    rules:
+      # Resource Usage Alerts
+      - alert: HighMemoryUsage
+        expr: (container_memory_usage_bytes{name="brainsait-healthcare"} / container_spec_memory_limit_bytes{name="brainsait-healthcare"}) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "High memory usage"
+          description: "Container memory usage is {{ $value | humanizePercentage }}."
+
+      - alert: HighCPUUsage
+        expr: rate(container_cpu_usage_seconds_total{name="brainsait-healthcare"}[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "High CPU usage"
+          description: "Container CPU usage is {{ $value | humanizePercentage }}."
+
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) < 0.1
+        for: 5m
+        labels:
+          severity: critical
+          component: infrastructure
+        annotations:
+          summary: "Low disk space"
+          description: "Only {{ $value | humanizePercentage }} disk space remaining."
+
+  - name: compliance
+    interval: 5m
+    rules:
+      # HIPAA Compliance Alerts
+      - alert: AuditLogNotWorking
+        expr: rate(audit_log_entries_total[10m]) == 0
+        for: 10m
+        labels:
+          severity: critical
+          component: compliance
+          compliance: hipaa
+        annotations:
+          summary: "HIPAA audit logging not functioning"
+          description: "No audit log entries recorded in last 10 minutes. HIPAA violation risk."
+
+      - alert: EncryptionDisabled
+        expr: tls_connection_encrypted == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: compliance
+          compliance: hipaa
+        annotations:
+          summary: "Unencrypted connection detected"
+          description: "HIPAA requires all PHI transmissions to be encrypted. Investigate immediately."
+
+      - alert: UnauthorizedDataAccess
+        expr: data_access_unauthorized_total > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: compliance
+          compliance: hipaa
+        annotations:
+          summary: "Unauthorized data access detected"
+          description: "{{ $value }} unauthorized access attempts detected. Security breach possible."
