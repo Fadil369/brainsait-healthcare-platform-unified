@@ -58,6 +58,8 @@ export class PHIAccessError extends Error {
  */
 export function sanitizeErrorMessage(error: Error): string {
   // List of patterns that might indicate sensitive data
+  // Note: These patterns are broad to catch potential PII/PHI in error messages.
+  // The 9-10 digit pattern catches Saudi National IDs but may also match other numbers.
   const sensitivePatterns = [
     /patient[_\s]?id/i,
     /ssn/i,
@@ -66,8 +68,8 @@ export function sanitizeErrorMessage(error: Error): string {
     /phi/i,
     /national[_\s]?id/i,
     /mrn/i,
-    /\b\d{9,10}\b/, // Saudi National ID pattern
-    /\b\d{3}-\d{2}-\d{4}\b/, // SSN pattern
+    /\b\d{9,10}\b/, // Catches Saudi National ID (10 digits) and similar identifiers
+    /\b\d{3}-\d{2}-\d{4}\b/, // US SSN pattern
   ];
 
   const message = error.message;
@@ -118,7 +120,9 @@ export function toErrorResponse(error: unknown): {
     return { error: error.message, code: 'RATE_LIMIT_ERROR', status: 429 };
   }
   if (error instanceof PHIAccessError) {
-    return { error: 'Access denied', code: 'PHI_ACCESS_ERROR', status: 403 };
+    // Always use sanitizeErrorMessage for PHI errors to ensure no sensitive data leaks
+    // even in development environments
+    return { error: sanitizeErrorMessage(error), code: 'PHI_ACCESS_ERROR', status: 403 };
   }
   if (error instanceof HealthcareAPIError) {
     return { 

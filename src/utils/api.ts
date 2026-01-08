@@ -89,8 +89,15 @@ export function isValidEmail(email: string): boolean {
 }
 
 /**
- * Sanitizes input for SQL-like queries (use parameterized queries instead when possible).
- * This is a defense-in-depth measure, not a replacement for prepared statements.
+ * Sanitizes input for SQL-like queries as a defense-in-depth measure.
+ * 
+ * WARNING: This function is NOT a replacement for parameterized queries/prepared statements.
+ * Always use parameterized queries when interacting with databases. This function provides
+ * an additional layer of protection but should never be relied upon as the primary defense
+ * against SQL injection.
+ * 
+ * @param input - The string to sanitize
+ * @returns A sanitized string with dangerous characters removed
  */
 export function sanitizeForSearch(input: string): string {
   // Remove or escape potentially dangerous characters
