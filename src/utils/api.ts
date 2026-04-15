@@ -40,3 +40,96 @@ export async function parseJson<T>(
   return schema ? schema.parse(data) : (data as T);
 }
 
+/**
+ * Sanitizes a string to prevent XSS attacks by escaping HTML entities.
+ * Use this for any user-provided string that will be rendered in HTML.
+ */
+export function sanitizeHtml(input: string): string {
+  const htmlEntities: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#x27;',
+    '/': '&#x2F;',
+    '`': '&#x60;',
+    '=': '&#x3D;',
+  };
+  return input.replace(/[&<>"'`=/]/g, (char) => htmlEntities[char] || char);
+}
+
+/**
+ * Validates and sanitizes a URL to prevent open redirect attacks.
+ * Only allows relative URLs or URLs from allowed origins.
+ */
+export function sanitizeUrl(url: string, allowedOrigins: string[] = []): string | null {
+  // Only allow relative URLs by default
+  if (url.startsWith('/') && !url.startsWith('//')) {
+    return url;
+  }
+  
+  try {
+    const parsedUrl = new URL(url);
+    if (allowedOrigins.includes(parsedUrl.origin)) {
+      return url;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Validates an email address format.
+ */
+export function isValidEmail(email: string): boolean {
+  const emailSchema = z.string().email();
+  const result = emailSchema.safeParse(email);
+  return result.success;
+}
+
+/**
+ * Sanitizes input for SQL-like queries as a defense-in-depth measure.
+ * 
+ * WARNING: This function is NOT a replacement for parameterized queries/prepared statements.
+ * Always use parameterized queries when interacting with databases. This function provides
+ * an additional layer of protection but should never be relied upon as the primary defense
+ * against SQL injection.
+ * 
+ * @param input - The string to sanitize
+ * @returns A sanitized string with dangerous characters removed
+ */
+export function sanitizeForSearch(input: string): string {
+  // Remove or escape potentially dangerous characters
+  return input
+    .replace(/['"`;\\]/g, '')
+    .replace(/--/g, '')
+    .trim()
+    .slice(0, 200); // Limit length
+}
+
+/**
+ * Creates a safe error response that doesn't leak sensitive information.
+ */
+export function createSafeErrorResponse(
+  message: string,
+  status: number = 500
+): Response {
+  // Don't expose internal error details in production
+  const safeMessage = process.env.NODE_ENV === 'production' 
+    ? 'An error occurred. Please try again later.'
+    : message;
+  
+  return new Response(
+    JSON.stringify({ 
+      error: safeMessage,
+      status,
+    }),
+    { 
+      status,
+      headers: { 'Content-Type': 'application/json' },
+    }
+  );
+}
+
+

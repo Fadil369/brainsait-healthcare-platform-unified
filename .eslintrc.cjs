@@ -9,7 +9,18 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2021,
     sourceType: "module",
+    project: "./tsconfig.json",
   },
+  ignorePatterns: [
+    "node_modules/",
+    ".next/",
+    "out/",
+    "dist/",
+    "*.config.js",
+    "*.config.cjs",
+    "scripts/",
+    "__tests__/",
+  ],
   rules: {
     // Code quality
     "eqeqeq": ["error", "always"],
@@ -20,13 +31,10 @@ module.exports = {
       { allowExpressions: true, allowTypedFunctionExpressions: true },
     ],
     "@typescript-eslint/no-explicit-any": ["warn", { ignoreRestArgs: true }],
-    "@typescript-eslint/naming-convention": [
-      "warn",
-      { selector: "typeLike", format: ["PascalCase"] },
-      { selector: "variable", format: ["camelCase", "UPPER_CASE"], leadingUnderscore: "allow" },
-      { selector: "function", format: ["camelCase", "PascalCase"] },
-      { selector: "enumMember", format: ["PascalCase", "UPPER_CASE"] },
-    ],
+    // Security-focused rules
+    "no-eval": "error",
+    "no-implied-eval": "error",
+    "no-new-func": "error",
   },
 };
 

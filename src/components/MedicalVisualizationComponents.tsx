@@ -33,6 +33,7 @@ interface PatientMetrics {
   category: string;
   value: number;
   color: string;
+  [key: string]: string | number;
 }
 
 interface MedicalChartProps {

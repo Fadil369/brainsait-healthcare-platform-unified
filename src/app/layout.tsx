@@ -1,16 +1,12 @@
 import "@/styles/globals.css";
 import type { Metadata } from "next";
-import { Inter, IBM_Plex_Sans_Arabic } from "next/font/google";
 import SkipLink from "@/components/SkipLink";
 import ToastProvider from "@/components/ToastProvider";
 import MeshBackground from "@/components/MeshBackground";
 
-const inter = Inter({ subsets: ["latin"], display: "swap" });
-const plexArabic = IBM_Plex_Sans_Arabic({ 
-  subsets: ["arabic"], 
-  display: "swap",
-  weight: ["400", "500", "600", "700"]
-});
+// Use system fonts as fallback. Google Fonts are loaded via CSS @import in globals.css
+// This approach ensures builds succeed even in restricted network environments
+const fontClassName = "font-sans";
 
 export const metadata: Metadata = {
   title: "BrainSAIT Unified Healthcare Platform",
@@ -55,10 +51,18 @@ export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
+}>): React.ReactElement {
   return (
-    <html lang="en" className={`${inter.className} ${plexArabic.className} font-sans`}>
-      <head />
+    <html lang="en" className={fontClassName}>
+      <head>
+        {/* Load Google Fonts via link tags for better build compatibility */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link 
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" 
+          rel="stylesheet" 
+        />
+      </head>
       <body className="font-sans antialiased">
         <ToastProvider>
           <MeshBackground className="fixed inset-0 -z-10" />

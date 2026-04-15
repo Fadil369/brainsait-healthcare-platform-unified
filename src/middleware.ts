@@ -1,6 +1,28 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
+/**
+ * Generates a secure request ID using crypto.randomUUID when available,
+ * falling back to a combination of timestamp and random bytes.
+ * While the fallback is not cryptographically ideal, it provides
+ * sufficient uniqueness for request correlation purposes.
+ */
+function generateRequestId(): string {
+  // Use crypto.randomUUID if available (standard in modern environments)
+  if (typeof globalThis.crypto?.randomUUID === 'function') {
+    return globalThis.crypto.randomUUID();
+  }
+  
+  // Fallback: Create a unique ID using available randomness
+  // This is sufficient for request correlation but not for security-critical purposes
+  const timestamp = Date.now().toString(36);
+  const randomPart = Array.from({ length: 16 }, () => 
+    Math.floor(Math.random() * 16).toString(16)
+  ).join('');
+  
+  return `${timestamp}-${randomPart}`;
+}
+
 // Lightweight, Edge-safe middleware: HTTPS, headers, request ID
 export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
@@ -30,10 +52,8 @@ export function middleware(request: NextRequest) {
     "camera=(), microphone=(), geolocation=()"
   );
 
-  // Request correlation id
-  const rid =
-    (globalThis.crypto as any)?.randomUUID?.() ||
-    `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  // Request correlation id using secure generation
+  const rid = generateRequestId();
   response.headers.set("X-Request-ID", rid);
   response.headers.set("X-Security-Checked", "true");
 
